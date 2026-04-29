@@ -1,4 +1,5 @@
-<?php /**
+<?php
+/**
  * Chargeurie — header.php
  */
 ?><!DOCTYPE html>
@@ -10,21 +11,29 @@
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+
 <div id="pbar"></div>
+
 <nav id="nav">
-  <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo"><?php chg_the_logo(); ?></a>
-  <?php wp_nav_menu( [
+  <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo">
+    <?php chg_the_logo(); ?>
+  </a>
+
+  <?php
+  wp_nav_menu( [
     'theme_location' => 'primary',
     'container'      => false,
     'menu_class'     => 'nav-links',
     'fallback_cb'    => function() { ?>
       <ul class="nav-links">
-        <li><a href="<?php echo esc_url( class_exists('WooCommerce') ? get_permalink( wc_get_page_id('shop') ) : '#' ); ?>">Produits</a></li>
+        <li><a href="<?php echo esc_url( class_exists('WooCommerce') ? get_permalink( wc_get_page_id( 'shop' ) ) : '#' ); ?>">Produits</a></li>
         <li><a href="#reveal">La lanière</a></li>
         <li><a href="#nl">Contact</a></li>
       </ul>
     <?php }
-  ] ); ?>
+  ] );
+  ?>
+
   <div class="nav-right">
     <?php if ( class_exists( 'WooCommerce' ) ) : ?>
       <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="nav-cart" aria-label="Panier">
@@ -36,9 +45,13 @@
           </svg>
         </span>
         <?php $count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0; ?>
-        <span class="cart-count" id="cartCount" <?php echo $count === 0 ? 'style="display:none;"' : ''; ?>><?php echo intval($count); ?></span>
+        <?php if ( $count > 0 ) : ?>
+          <span class="cart-count" id="cartCount"><?php echo intval( $count ); ?></span>
+        <?php else : ?>
+          <span class="cart-count" id="cartCount" style="display:none;">0</span>
+        <?php endif; ?>
       </a>
     <?php endif; ?>
-    <a href="<?php echo esc_url( class_exists('WooCommerce') ? get_permalink( wc_get_page_id('shop') ) : '#' ); ?>" class="nav-cta">Commander</a>
+    <a href="<?php echo esc_url( class_exists('WooCommerce') ? get_permalink( wc_get_page_id( 'shop' ) ) : '#' ); ?>" class="nav-cta">Commander</a>
   </div>
 </nav>
