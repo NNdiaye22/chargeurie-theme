@@ -24,6 +24,16 @@ function chg_enqueue_assets() {
         );
     }
 
+    // Shop CSS — boutique + fiche produit uniquement
+    if ( class_exists( 'WooCommerce' ) && ( is_shop() || is_product_category() || is_product_tag() || is_product() ) ) {
+        wp_enqueue_style(
+            'chg-shop',
+            CHG_URI . '/assets/css/shop.css',
+            [ 'chg-main', 'chg-woocommerce' ],
+            CHG_VERSION
+        );
+    }
+
     // GSAP core (CDN)
     wp_enqueue_script(
         'gsap',
