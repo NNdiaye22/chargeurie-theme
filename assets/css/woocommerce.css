@@ -1,0 +1,20 @@
+/* Chargeurie — WooCommerce override */
+.woocommerce-loop-product__title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--ink);margin-bottom:0.5rem;}
+.woocommerce-Price-amount{font-size:0.9rem;color:var(--ink);font-weight:600;}
+.price del{color:var(--stone);font-weight:400;margin-right:0.4rem;}
+.price ins{text-decoration:none;color:var(--blue);}
+.button,button[type=submit],input[type=submit]{background:var(--ink);color:var(--white);border:0;padding:0.9rem 2.2rem;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;border-radius:0;transition:opacity 0.3s;}
+.button:hover{opacity:0.75;color:var(--white);}
+.woocommerce-message,.woocommerce-info{border-top-color:var(--blue);background:var(--silk);font-size:0.82rem;}
+.woocommerce-error{border-top-color:#ff3b30;background:var(--silk);font-size:0.82rem;}
+.quantity .qty{border:1px solid var(--mid);padding:0.6rem 1rem;font-size:0.9rem;width:70px;background:transparent;color:var(--ink);text-align:center;}
+.single_add_to_cart_button{width:100%;padding:1.1rem 2rem;font-size:0.62rem;letter-spacing:0.35em;}
+.woocommerce-product-gallery{background:var(--silk);}
+.woocommerce-tabs ul.tabs{border-bottom:1px solid var(--mid);margin-bottom:2rem;list-style:none;display:flex;gap:0;}
+.woocommerce-tabs ul.tabs li a{font-size:0.58rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--stone);text-decoration:none;padding:1rem 1.5rem;display:block;}
+.woocommerce-tabs ul.tabs li.active a{color:var(--ink);border-bottom:2px solid var(--ink);}
+.woocommerce-tabs ul.tabs li{border:0;background:transparent;}
+.woocommerce-tabs ul.tabs li::before,.woocommerce-tabs ul.tabs li::after{display:none;}
+.woocommerce .summary{font-size:0.9rem;color:var(--stone);line-height:1.8;}
+.woocommerce .summary .price{font-size:1.5rem;font-weight:700;color:var(--ink);margin:1rem 0 2rem;}
+.woocommerce .summary .product_title{font-size:clamp(1.8rem,3vw,3rem);font-weight:800;letter-spacing:-0.03em;color:var(--ink);}

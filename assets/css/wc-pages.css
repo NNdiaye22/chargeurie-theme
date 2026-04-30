@@ -1,0 +1,12 @@
+/* Chargeurie — WC pages (cart, checkout, account) */
+.chg-cart .woocommerce table.cart th,.chg-cart .woocommerce table.cart td{padding:1.2rem;border:0;border-bottom:1px solid var(--mid);font-size:0.82rem;vertical-align:middle;}
+.chg-cart .cart_totals h2,.chg-checkout h3{font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--stone);margin-bottom:1.5rem;}
+.chg-cart .cart_totals table{width:100%;border-collapse:collapse;margin-bottom:2rem;}
+.chg-cart .cart_totals .order-total td,.chg-cart .cart_totals .order-total th{font-weight:700;font-size:1.1rem;}
+.chg-checkout .woocommerce-checkout form input[type=text],.chg-checkout .woocommerce-checkout form input[type=email],.chg-checkout .woocommerce-checkout form input[type=tel],.chg-checkout .woocommerce-checkout form select,.chg-checkout .woocommerce-checkout form textarea{width:100%;padding:0.9rem 1.2rem;border:1px solid var(--mid);background:transparent;font-size:0.85rem;color:var(--ink);border-radius:0;}
+.chg-checkout .woocommerce-checkout form input:focus,.chg-checkout .woocommerce-checkout form textarea:focus{outline:none;border-color:var(--blue);}
+.chg-checkout .col2-set{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.chg-account .woocommerce-MyAccount-navigation ul{list-style:none;display:flex;gap:2rem;margin-bottom:4rem;border-bottom:1px solid var(--mid);padding-bottom:1.5rem;flex-wrap:wrap;}
+.chg-account .woocommerce-MyAccount-navigation a{font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--stone);text-decoration:none;transition:color 0.3s;}
+.chg-account .woocommerce-MyAccount-navigation a:hover,.chg-account .woocommerce-MyAccount-navigation .is-active a{color:var(--ink);}
+@media(max-width:700px){.chg-checkout .col2-set{grid-template-columns:1fr;}}
