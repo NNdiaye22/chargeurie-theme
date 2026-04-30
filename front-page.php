@@ -72,7 +72,6 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
         loading="eager"
       >
     <?php elseif ( $hero_img_desktop_id ) : ?>
-      <!-- Fallback : image desktop aussi sur mobile si pas d'image mobile -->
       <img
         src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>"
         alt=""
@@ -101,8 +100,9 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
     <div class="hero-meta"><?php echo $hero_meta; ?></div>
   </div>
 
+  <!-- Scroll hint : trait seul, sans texte -->
   <div class="scroll-hint" id="scrollHint">
-    <div class="sh-inner"><span class="sh-text">SCROLL</span><div class="sh-line"></div></div>
+    <div class="sh-inner"><div class="sh-line"></div></div>
   </div>
 </section>
 

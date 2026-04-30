@@ -1,4 +1,4 @@
-/* Chargeurie — main.js v3 | GSAP + burger + responsive */
+/* Chargeurie — main.js v3.1 | GSAP + burger + responsive */
 /* global gsap, ScrollTrigger, chgData */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -8,13 +8,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   gsap.registerPlugin(ScrollTrigger);
 
-  // ── Barre de progression ─────────────────────────────
+  // ── Barre de progression ────────────────────────────
   ScrollTrigger.create({
     start: 0, end: 'max',
     onUpdate: self => gsap.set('#pbar', { scaleX: self.progress })
   });
 
-  // ── Nav couleur ──────────────────────────────────────
+  // ── Nav couleur ────────────────────────────────────
   const nav = document.getElementById('nav');
   if (nav) {
     ScrollTrigger.create({
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── Burger menu mobile ───────────────────────────────
+  // ── Burger menu mobile ─────────────────────────────
   const burgerBtn  = document.getElementById('burgerBtn');
   const mobileMenu = document.getElementById('mobileMenu');
   let menuOpen = false;
@@ -74,12 +74,10 @@ document.addEventListener('DOMContentLoaded', function () {
     burgerBtn.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
     document.getElementById('mobileClose')?.addEventListener('click', closeMenu);
     document.querySelectorAll('.mobile-links a, .mobile-cta').forEach(l => l.addEventListener('click', closeMenu));
-
-    // Fermer sur Escape
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) closeMenu(); });
   }
 
-  // ── Hero entrance ────────────────────────────────────
+  // ── Hero entrance ──────────────────────────────────
   gsap.set('.hero-line',    { y: '110%' });
   gsap.set('.hero-eyebrow', { opacity: 0, y: 12 });
   gsap.set('.hero-bottom',  { opacity: 0, y: 20 });
@@ -90,16 +88,16 @@ document.addEventListener('DOMContentLoaded', function () {
     .to('.hero-eyebrow', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.6')
     .to('.hero-bottom',  { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4');
 
-  // ── Soulignement bleu ────────────────────────────────
+  // ── Soulignement bleu ──────────────────────────────
   gsap.to('.hero-underline', { width: '100%', duration: 1.1, ease: 'power4.inOut', delay: 1.1 });
 
-  // ── Parallax hero ────────────────────────────────────
+  // ── Parallax hero ──────────────────────────────────
   gsap.to('.hero-eyebrow, .hero-bottom', {
     y: -40, ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
   });
 
-  // ── Scroll hint ──────────────────────────────────────
+  // ── Scroll hint (trait seul) ─────────────────────────
   const sh = document.getElementById('scrollHint');
   if (sh) {
     ScrollTrigger.create({
@@ -109,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── Ticker cache ─────────────────────────────────────
+  // ── Ticker cache ───────────────────────────────────
   const tw = document.getElementById('tickerWrap');
   if (tw) {
     ScrollTrigger.create({
@@ -119,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── Canvas particules ─────────────────────────────────
+  // ── Canvas particules (renforcées) ──────────────────────
   const canvas = document.getElementById('heroCanvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -127,29 +125,42 @@ document.addEventListener('DOMContentLoaded', function () {
     function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
     resize();
     window.addEventListener('resize', resize);
+
     function Particle() {
       this.reset = function() {
-        this.x = W * Math.random(); this.y = H + 20;
-        this.vx = (Math.random() - .5) * .5; this.vy = -(Math.random() * 1.5 + .5);
-        this.alpha = Math.random() * .6 + .2; this.r = Math.random() * 2 + .5;
-        this.color = Math.random() > .5 ? '#0071e3' : '#2997ff';
+        this.x     = W * Math.random();
+        this.y     = H + 20;
+        this.vx    = (Math.random() - .5) * .7;
+        this.vy    = -(Math.random() * 1.8 + .6);  // monte plus vite
+        this.alpha = Math.random() * .7 + .35;      // plus opaque (0.35–1.0)
+        this.r     = Math.random() * 3 + 1;         // plus grosse (1–4px)
+        this.color = Math.random() > .45 ? '#0071e3' : '#2997ff';
       };
-      this.reset(); this.y = Math.random() * H;
+      this.reset();
+      this.y = Math.random() * H; // position initiale aléatoire
     }
-    for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+    // 140 particules au lieu de 80
+    for (let i = 0; i < 140; i++) particles.push(new Particle());
+
     function draw() {
       ctx.clearRect(0, 0, W, H);
       particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy; p.alpha -= .003;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= .0018; // disparition plus lente
         if (p.alpha <= 0 || p.y < -20) p.reset();
         ctx.globalAlpha = p.alpha;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color; ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
       });
       ctx.globalAlpha = 1;
       frame = requestAnimationFrame(draw);
     }
     draw();
+
     ScrollTrigger.create({
       trigger: '.hero', start: 'bottom top',
       onEnter:     () => cancelAnimationFrame(frame),
@@ -157,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── Compteurs stats ───────────────────────────────────
+  // ── Compteurs stats ─────────────────────────────────
   document.querySelectorAll('.count-up').forEach(el => {
     const target = parseFloat(el.dataset.target);
     if (isNaN(target)) return;
@@ -181,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
     scrollTrigger: { trigger: '.stats', start: 'top 85%' }
   });
 
-  // ── Manifeste mot par mot ─────────────────────────────
+  // ── Manifeste mot par mot ───────────────────────────
   const words = gsap.utils.toArray('.manifesto-word');
   if (words.length) {
     const mTL = gsap.timeline({
@@ -194,14 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
     scrollTrigger: { trigger: '.manifesto-sub', start: 'top 80%' }
   });
 
-  // ── Cards produits ────────────────────────────────────
+  // ── Cards produits ──────────────────────────────────
   gsap.fromTo('.product-card',
     { opacity: 0, y: 80 },
     { opacity: 1, y: 0, duration: 0.8, stagger: 0.14, ease: 'power3.out',
       scrollTrigger: { trigger: '.products-grid', start: 'top 75%' } }
   );
 
-  // ── Reveal section ────────────────────────────────────
+  // ── Reveal section ─────────────────────────────────
   gsap.from('#reveal .reveal-left h2', {
     opacity: 0, y: 40, duration: 1, ease: 'power3.out',
     scrollTrigger: { trigger: '#reveal', start: 'top 70%' }
@@ -215,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
     scrollTrigger: { trigger: '#reveal', start: 'top 65%' }
   });
 
-  // ── Boutons magnétiques ───────────────────────────────
+  // ── Boutons magnétiques ─────────────────────────────
   const isTouchDevice = window.matchMedia('(hover:none)').matches;
   if (!isTouchDevice) {
     document.querySelectorAll('.btn-dark, .nav-cta, .hero-cta').forEach(btn => {
@@ -231,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── AJAX Add to Cart ──────────────────────────────────
+  // ── AJAX Add to Cart ────────────────────────────────
   document.querySelectorAll('[data-product-id]').forEach(function(card) {
     const btn = card.querySelector('.card-add');
     if (!btn) return;
