@@ -47,6 +47,41 @@ function chg_customizer_register( $wp_customize ) {
         $wp_customize->add_control( $key, [ 'label' => $args['label'], 'section' => 'chg_hero', 'type' => 'text' ] );
     }
 
+    // ---- Bannière hero : images desktop + mobile ----
+    $wp_customize->add_setting( 'chg_hero_img_desktop', [
+        'default'           => 0,
+        'sanitize_callback' => 'absint',
+    ] );
+    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_desktop', [
+        'label'       => '🖥 Image Hero — Desktop (recommandé : 1920×1080)',
+        'description' => 'Affichée sur écrans > 768px.',
+        'section'     => 'chg_hero',
+        'mime_type'   => 'image',
+    ] ) );
+
+    $wp_customize->add_setting( 'chg_hero_img_mobile', [
+        'default'           => 0,
+        'sanitize_callback' => 'absint',
+    ] );
+    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_mobile', [
+        'label'       => '📱 Image Hero — Mobile (recommandé : 750×1334)',
+        'description' => 'Affichée sur écrans ≤ 768px. Si vide, l\'image desktop sera utilisée.',
+        'section'     => 'chg_hero',
+        'mime_type'   => 'image',
+    ] ) );
+
+    $wp_customize->add_setting( 'chg_hero_overlay', [
+        'default'           => '0.55',
+        'sanitize_callback' => 'sanitize_text_field',
+    ] );
+    $wp_customize->add_control( 'chg_hero_overlay', [
+        'label'       => 'Opacité overlay sombre (0 = transparent, 1 = noir)',
+        'description' => 'Assombrit la bannière pour garder le texte lisible.',
+        'section'     => 'chg_hero',
+        'type'        => 'range',
+        'input_attrs' => [ 'min' => '0', 'max' => '1', 'step' => '0.05' ],
+    ] );
+
     // ---- Section : Manifeste ----
     $wp_customize->add_section( 'chg_manifesto', [
         'title' => 'Page d\'accueil — Manifeste',

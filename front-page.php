@@ -1,7 +1,6 @@
 <?php
 /**
  * Chargeurie — front-page.php
- * Homepage avec toutes les animations du HTML d'origine
  */
 get_header();
 
@@ -16,6 +15,11 @@ $manifesto_lbl = esc_html( chg_option( 'chg_manifesto_label', 'Notre conviction'
 $manifesto_raw = chg_option( 'chg_manifesto_text', 'Conçu pour être porté, pas rangé.' );
 $manifesto_sub = esc_html( chg_option( 'chg_manifesto_sub', 'La technologie la plus utile est celle que vous avez toujours sur vous. Chargeurie conçoit des accessoires qui disparaissent dans votre quotidien — jusqu\'au moment où vous en avez besoin.' ) );
 $ticker_text   = esc_html( chg_option( 'chg_ticker_text', 'Charge Rapide 60 W · USB-C 3A · 5 Coloris · Lanière Téléphone · Câble Bracelet · 4-en-1 · Livraison offerte dès 35 € · Garantie 2 ans ·' ) );
+
+// Hero images
+$hero_img_desktop_id = intval( get_theme_mod( 'chg_hero_img_desktop', 0 ) );
+$hero_img_mobile_id  = intval( get_theme_mod( 'chg_hero_img_mobile',  0 ) );
+$hero_overlay        = esc_attr( get_theme_mod( 'chg_hero_overlay', '0.55' ) );
 
 $stats = [];
 for ( $i = 1; $i <= 4; $i++ ) {
@@ -48,6 +52,37 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
 <!-- HERO -->
 <section class="hero" id="hero">
   <canvas id="heroCanvas" aria-hidden="true"></canvas>
+
+  <?php if ( $hero_img_desktop_id || $hero_img_mobile_id ) : ?>
+  <div class="hero-bg" aria-hidden="true">
+    <?php if ( $hero_img_desktop_id ) : ?>
+      <img
+        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>"
+        alt=""
+        class="hero-bg-desktop"
+        loading="eager"
+        fetchpriority="high"
+      >
+    <?php endif; ?>
+    <?php if ( $hero_img_mobile_id ) : ?>
+      <img
+        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_mobile_id, 'chg-product-featured' ) ); ?>"
+        alt=""
+        class="hero-bg-mobile"
+        loading="eager"
+      >
+    <?php elseif ( $hero_img_desktop_id ) : ?>
+      <!-- Fallback : image desktop aussi sur mobile si pas d'image mobile -->
+      <img
+        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>"
+        alt=""
+        class="hero-bg-mobile"
+        loading="eager"
+      >
+    <?php endif; ?>
+    <div class="hero-overlay" style="--overlay-opacity:<?php echo $hero_overlay; ?>"></div>
+  </div>
+  <?php endif; ?>
 
   <div class="hero-eyebrow"><?php echo $hero_eyebrow; ?></div>
 
@@ -137,11 +172,11 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
     <div class="cta-row"><a href="<?php echo esc_url( $shop_url ); ?>" class="btn-dark">Découvrir &rarr;</a></div>
   </div>
   <div class="reveal-right">
-    <div class="spec-row"><div class="spec-label">Puissance</div><div class="spec-value">3A — Charge rapide 18 W</div></div>
-    <div class="spec-row"><div class="spec-label">Longueur câble</div><div class="spec-value">13,5 cm</div></div>
+    <div class="spec-row"><div class="spec-label">Puissance</div><div class="spec-value">3A — Charge rapide 18 W</div></div>
+    <div class="spec-row"><div class="spec-label">Longueur câble</div><div class="spec-value">13,5 cm</div></div>
     <div class="spec-row"><div class="spec-label">Coloris</div><div class="spec-value">5 teintes disponibles</div></div>
     <div class="spec-row"><div class="spec-label">Compatibilité</div><div class="spec-value">iPhone &amp; Android USB-C</div></div>
-    <div class="spec-row"><div class="spec-label">Livraison</div><div class="spec-value">Offerte dès 35 €</div></div>
+    <div class="spec-row"><div class="spec-label">Livraison</div><div class="spec-value">Offerte dès 35 €</div></div>
   </div>
 </section>
 
@@ -155,7 +190,7 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
         $mc_id = chg_option( 'chg_mc4wp_form_id', '' );
         echo $mc_id ? do_shortcode( '[mc4wp_form id="' . intval($mc_id) . '"]' ) : do_shortcode('[mc4wp_form]');
     else : ?>
-      <form class="nl-form" onsubmit="event.preventDefault();this.innerHTML='<span style=\'color:var(--blue)\'>Merci ! &#127881;</span>';">
+      <form class="nl-form" onsubmit="event.preventDefault();this.innerHTML='<span style=\'color:var(--blue)\'>Merci ! &#127881;</span>';">
         <input type="email" placeholder="votre@email.com" required class="nl-input">
         <button type="submit" class="btn-dark nl-btn">S'inscrire</button>
       </form>

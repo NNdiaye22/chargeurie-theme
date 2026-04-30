@@ -14,6 +14,29 @@
 
 <div id="pbar"></div>
 
+<!-- MOBILE MENU OVERLAY -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Menu principal">
+  <div class="mobile-menu-inner">
+    <ul class="mobile-links">
+      <?php
+      $shop_url = class_exists( 'WooCommerce' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : '#';
+      ?>
+      <li><a href="<?php echo esc_url( $shop_url ); ?>">Produits</a></li>
+      <li><a href="#reveal">La Lanière</a></li>
+      <li><a href="#manifesto">Notre ADN</a></li>
+      <li><a href="#nl">Contact</a></li>
+    </ul>
+    <a href="<?php echo esc_url( $shop_url ); ?>" class="mobile-cta btn-dark">Commander &rarr;</a>
+    <div class="mobile-meta">USB-C &middot; 60W &middot; France</div>
+  </div>
+  <button class="mobile-close" id="mobileClose" aria-label="Fermer le menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
 <nav id="nav">
   <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo">
     <?php chg_the_logo(); ?>
@@ -53,5 +76,12 @@
       </a>
     <?php endif; ?>
     <a href="<?php echo esc_url( class_exists('WooCommerce') ? get_permalink( wc_get_page_id( 'shop' ) ) : '#' ); ?>" class="nav-cta">Commander</a>
+
+    <!-- BURGER -->
+    <button class="burger" id="burgerBtn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
   </div>
 </nav>
