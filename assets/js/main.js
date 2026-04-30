@@ -1,116 +1,156 @@
-/* Chargeurie — main.js | GSAP 3.12.5 + ScrollTrigger */
+/* Chargeurie — main.js */
 /* global gsap, ScrollTrigger, chgData */
-
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
   gsap.registerPlugin(ScrollTrigger);
 
-  // ── Progress bar
-  const pbar = document.getElementById('pbar');
-  if (pbar) {
-    ScrollTrigger.create({
-      start: 0, end: 'max',
-      onUpdate: self => { pbar.style.width = (self.progress * 100) + '%'; }
-    });
-  }
+  // Progress bar
+  ScrollTrigger.create({
+    start:0, end:'max',
+    onUpdate: self => gsap.set('#pbar', { scaleX: self.progress })
+  });
 
-  // ── Nav scroll
+  // Nav scroll
   const nav = document.getElementById('nav');
   if (nav) {
     ScrollTrigger.create({
-      start: 80,
-      onEnter:    () => nav.classList.add('scrolled'),
-      onLeaveBack:() => nav.classList.remove('scrolled'),
+      start: 1,
+      onEnter:  () => nav.classList.add('scrolled'),
+      onLeaveBack: () => nav.classList.remove('scrolled')
+    });
+    ScrollTrigger.create({
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      onLeave:     () => nav.classList.add('light'),
+      onEnterBack: () => nav.classList.remove('light')
     });
   }
 
-  // ── Hero
-  const heroTL = gsap.timeline({
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 }
-  });
-  heroTL.to('.hero-inner', { y: 120, opacity: 0.3, ease: 'none' });
-
-  // ── Reveal section
-  const revealElems = document.querySelectorAll('.reveal-elem');
-  if (revealElems.length) {
-    gsap.fromTo(revealElems, { opacity: 0, y: 50 }, {
-      opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: 'power3.out',
-      scrollTrigger: { trigger: '.reveal-section', start: 'top 65%' }
+  // Hero canvas
+  const canvas = document.getElementById('heroCanvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [], frame;
+    function resize(){
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    function Particle(){
+      this.reset = function(){
+        this.x = W * Math.random();
+        this.y = H + 20;
+        this.vx = (Math.random() - .5) * .5;
+        this.vy = -(Math.random() * 1.5 + .5);
+        this.alpha = Math.random() * .6 + .2;
+        this.r = Math.random() * 2 + .5;
+        this.color = Math.random() > .5 ? '#0071e3' : '#2997ff';
+      };
+      this.reset();
+      this.y = Math.random() * H;
+    }
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.alpha -= .003;
+        if (p.alpha <= 0 || p.y < -20) p.reset();
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      frame = requestAnimationFrame(draw);
+    }
+    draw();
+    ScrollTrigger.create({
+      trigger: '.hero',
+      start: 'bottom top',
+      onEnter: () => cancelAnimationFrame(frame),
+      onLeaveBack: () => draw()
     });
   }
 
-  // ── Slide track (drag)
-  const track = document.getElementById('slideTrack');
-  if (track) {
-    let isDragging = false, startX = 0, scrollLeft = 0;
-    track.addEventListener('mousedown', e => {
-      isDragging = true; startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft;
-      track.style.cursor = 'grabbing';
-    });
-    document.addEventListener('mouseup', () => { isDragging = false; track.style.cursor = 'grab'; });
-    track.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - track.offsetLeft;
-      track.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  // Scroll hint
+  const sh = document.getElementById('scrollHint');
+  if (sh) {
+    ScrollTrigger.create({
+      trigger: '.hero',
+      start: '20% top',
+      onEnter:     () => gsap.to(sh, { opacity:0, y:20, duration:.6 }),
+      onLeaveBack: () => gsap.to(sh, { opacity:1, y:0,  duration:.6 })
     });
   }
 
-  // ── Slide cards fade
-  gsap.fromTo('.slide-card', { opacity: 0, y: 40 }, {
-    opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power3.out',
-    scrollTrigger: { trigger: '.slide-section', start: 'top 70%' }
-  });
-
-  // ── Manifesto word-by-word
-  const manifestoLine = document.getElementById('manifestoLine');
-  if (manifestoLine) {
-    const words = manifestoLine.textContent.split(' ');
-    manifestoLine.innerHTML = words.map(w => '<span class="mw">' + w + '</span>').join(' ');
-    gsap.fromTo('.mw', { opacity: 0.12 }, {
-      opacity: 1, stagger: 0.08, ease: 'none',
-      scrollTrigger: { trigger: '.manifesto', start: 'top 60%', end: 'bottom 60%', scrub: true }
-    });
-  }
-
-  // ── Stats counter
+  // Stats counter
   document.querySelectorAll('.stat-num').forEach(el => {
+    const num = parseFloat(el.textContent);
+    if (isNaN(num)) return;
     const suffix = el.querySelector('.stat-suffix');
-    const raw    = el.textContent.replace(suffix ? suffix.textContent : '', '').trim();
-    const target = parseFloat(raw);
-    if (isNaN(target)) return;
-    gsap.fromTo({ val: 0 }, { val: target, duration: 2, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 80%', once: true },
-      onUpdate: function () {
-        el.childNodes[0].textContent = Number.isInteger(target)
-          ? Math.round(this.targets()[0].val)
-          : this.targets()[0].val.toFixed(1);
+    const suffixText = suffix ? suffix.outerHTML : '';
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        gsap.fromTo(el, { innerText: 0 }, {
+          innerText: num, duration: 1.6, ease: 'power2.out',
+          snap: { innerText: num < 10 ? .1 : 1 },
+          onUpdate() { el.innerHTML = Math.round(this.targets()[0].innerText * 10) / 10 + suffixText; }
+        });
       }
     });
   });
 
-  // ── Ticker pause on hover
-  const ticker = document.getElementById('ticker');
-  if (ticker) {
-    ticker.addEventListener('mouseenter', () => ticker.style.animationPlayState = 'paused');
-    ticker.addEventListener('mouseleave', () => ticker.style.animationPlayState = 'running');
+  // Manifeste
+  const mt = document.getElementById('manifestoText');
+  if (mt) {
+    gsap.fromTo(mt,
+      { opacity: 0, y: 60 },
+      { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
+        scrollTrigger: { trigger: mt, start: 'top 75%' } }
+    );
   }
 
-  // ── AJAX Add to Cart
-  document.querySelectorAll('[data-product-id]').forEach(function (card) {
+  // Cards stagger
+  gsap.fromTo('.product-card',
+    { opacity: 0, y: 80 },
+    { opacity: 1, y: 0, duration: .9, ease: 'power3.out', stagger: .12,
+      scrollTrigger: { trigger: '.products-grid', start: 'top 80%' } }
+  );
+
+  // Ticker
+  const tw = document.getElementById('tickerWrap');
+  if (tw) {
+    ScrollTrigger.create({
+      trigger: document.body,
+      start: 100,
+      onEnter:     () => gsap.to(tw, { y: -28, duration: .5, ease: 'power2.inOut' }),
+      onLeaveBack: () => gsap.to(tw, { y: 0,  duration: .5, ease: 'power2.inOut' })
+    });
+  }
+
+  // AJAX Add to Cart
+  document.querySelectorAll('[data-product-id]').forEach(function(card) {
     var btn = card.querySelector('.card-add');
-    if (!btn || !window.chgData) return;
-    btn.addEventListener('click', function (e) {
-      var href = btn.getAttribute('href');
-      if (href && href !== '#') return; // lien normal
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+      if (!window.chgData) return;
       e.preventDefault();
       fetch(chgData.ajaxUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
-          action: 'chg_add_to_cart', nonce: chgData.nonce,
-          product_id: card.dataset.productId, quantity: 1
-        })
+          action: 'chg_add_to_cart',
+          nonce: chgData.nonce,
+          product_id: card.dataset.productId,
+          quantity: 1,
+        }),
       })
       .then(r => r.json())
       .then(data => {
@@ -119,14 +159,13 @@ document.addEventListener('DOMContentLoaded', function () {
           if (cc) {
             cc.textContent = data.data.cart_count;
             cc.style.display = 'flex';
-            gsap.fromTo(cc, { scale: 1.5 }, { scale: 1, duration: 0.4, ease: 'back.out(2)' });
+            gsap.fromTo(cc, {scale:1.4}, {scale:1, duration:.3, ease:'back.out(2)'});
           }
-          btn.textContent = 'Ajout\u00e9 !';
+          btn.textContent = 'Ajouté !';
           setTimeout(() => { btn.textContent = 'Voir'; }, 2000);
         }
-      })
-      .catch(console.error);
+      });
     });
   });
 
-});
+}); // end DOMContentLoaded

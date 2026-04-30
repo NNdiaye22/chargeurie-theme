@@ -1,10 +1,9 @@
 <?php
-defined( 'ABSPATH' ) || exit;
+/**
+ * Chargeurie — woocommerce/single-product.php
+ */
 get_header();
-?>
-<main class="chg-wc-main chg-single-product">
-  <?php while ( have_posts() ) : the_post(); ?>
-    <?php wc_get_template_part( 'content', 'single-product' ); ?>
-  <?php endwhile; ?>
-</main>
-<?php get_footer(); ?>
+while ( have_posts() ) : the_post();
+    wc_get_template_part( 'content', 'single-product' );
+endwhile;
+get_footer();
