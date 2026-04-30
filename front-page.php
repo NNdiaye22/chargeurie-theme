@@ -16,7 +16,6 @@ $manifesto_raw = chg_option( 'chg_manifesto_text', 'Conçu pour être porté, pa
 $manifesto_sub = esc_html( chg_option( 'chg_manifesto_sub', 'La technologie la plus utile est celle que vous avez toujours sur vous. Chargeurie conçoit des accessoires qui disparaissent dans votre quotidien — jusqu\'au moment où vous en avez besoin.' ) );
 $ticker_text   = esc_html( chg_option( 'chg_ticker_text', 'Charge Rapide 60 W · USB-C 3A · 5 Coloris · Lanière Téléphone · Câble Bracelet · 4-en-1 · Livraison offerte dès 35 € · Garantie 2 ans ·' ) );
 
-// Hero images
 $hero_img_desktop_id = intval( get_theme_mod( 'chg_hero_img_desktop', 0 ) );
 $hero_img_mobile_id  = intval( get_theme_mod( 'chg_hero_img_mobile',  0 ) );
 $hero_overlay        = esc_attr( get_theme_mod( 'chg_hero_overlay', '0.55' ) );
@@ -56,28 +55,12 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
   <?php if ( $hero_img_desktop_id || $hero_img_mobile_id ) : ?>
   <div class="hero-bg" aria-hidden="true">
     <?php if ( $hero_img_desktop_id ) : ?>
-      <img
-        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>"
-        alt=""
-        class="hero-bg-desktop"
-        loading="eager"
-        fetchpriority="high"
-      >
+      <img src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>" alt="" class="hero-bg-desktop" loading="eager" fetchpriority="high">
     <?php endif; ?>
     <?php if ( $hero_img_mobile_id ) : ?>
-      <img
-        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_mobile_id, 'chg-product-featured' ) ); ?>"
-        alt=""
-        class="hero-bg-mobile"
-        loading="eager"
-      >
+      <img src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_mobile_id, 'chg-product-featured' ) ); ?>" alt="" class="hero-bg-mobile" loading="eager">
     <?php elseif ( $hero_img_desktop_id ) : ?>
-      <img
-        src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>"
-        alt=""
-        class="hero-bg-mobile"
-        loading="eager"
-      >
+      <img src="<?php echo esc_url( wp_get_attachment_image_url( $hero_img_desktop_id, 'chg-hero' ) ); ?>" alt="" class="hero-bg-mobile" loading="eager">
     <?php endif; ?>
     <div class="hero-overlay" style="--overlay-opacity:<?php echo $hero_overlay; ?>"></div>
   </div>
@@ -100,7 +83,6 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
     <div class="hero-meta"><?php echo $hero_meta; ?></div>
   </div>
 
-  <!-- Scroll hint : trait seul, sans texte -->
   <div class="scroll-hint" id="scrollHint">
     <div class="sh-inner"><div class="sh-line"></div></div>
   </div>
@@ -147,7 +129,11 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
             <?php endif; ?>
             <?php $tid = $product->get_image_id(); ?>
             <?php if ( $tid ) : echo wp_get_attachment_image( $tid, 'chg-product-card', false, ['class'=>'slide-product-img','loading'=>'lazy'] );
-            else : ?><div class="card-placeholder"><span class="card-placeholder-icon">&#9889;</span></div><?php endif; ?>
+            else : ?>
+              <div class="card-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M8 1.5L2.5 8H7L5.5 12.5L12 6H7.5L8 1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity=".15"/></svg>
+              </div>
+            <?php endif; ?>
           </a>
           <div class="card-info">
             <div class="card-name"><?php echo esc_html( $product->get_name() ); ?></div>
@@ -190,7 +176,7 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
         $mc_id = chg_option( 'chg_mc4wp_form_id', '' );
         echo $mc_id ? do_shortcode( '[mc4wp_form id="' . intval($mc_id) . '"]' ) : do_shortcode('[mc4wp_form]');
     else : ?>
-      <form class="nl-form" onsubmit="event.preventDefault();this.innerHTML='<span style=\'color:var(--blue)\'>Merci ! &#127881;</span>';">
+      <form class="nl-form" onsubmit="event.preventDefault();this.innerHTML='<span style=\'color:var(--blue)\'>Merci. Bienvenue !</span>';">
         <input type="email" placeholder="votre@email.com" required class="nl-input">
         <button type="submit" class="btn-dark nl-btn">S'inscrire</button>
       </form>
