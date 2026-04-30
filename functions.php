@@ -67,10 +67,11 @@ function chg_theme_setup() {
     add_theme_support( 'title-tag' );
     add_theme_support( 'post-thumbnails' );
     add_theme_support( 'custom-logo', [
-        'height'      => 80,
-        'width'       => 300,
-        'flex-height' => true,
-        'flex-width'  => true,
+        'height'               => 60,
+        'width'                => 200,
+        'flex-height'          => true,
+        'flex-width'           => true,
+        'unlink-homepage-logo' => true,
     ] );
     add_theme_support( 'html5', [
         'search-form', 'comment-form', 'comment-list',
@@ -96,9 +97,12 @@ function chg_theme_setup() {
         'footer_3' => __( 'Footer — Service Client', 'chargeurie' ),
     ] );
     add_theme_support( 'automatic-feed-links' );
-    add_image_size( 'chg-product-card',     600,  800,  true );
-    add_image_size( 'chg-product-featured', 900,  1200, true );
-    add_image_size( 'chg-hero',             1920, 1080, true );
+
+    // Tailles d'images personnalisées
+    add_image_size( 'chg-logo',             200,  60,   false ); // Logo nav — proportionnel
+    add_image_size( 'chg-product-card',     600,  800,  true  );
+    add_image_size( 'chg-product-featured', 900,  1200, true  );
+    add_image_size( 'chg-hero',             1920, 1080, true  );
 }
 add_action( 'after_setup_theme', 'chg_theme_setup' );
 
@@ -127,8 +131,13 @@ add_action( 'widgets_init', 'chg_widgets_init' );
 function chg_the_logo( $return = false ) {
     $logo_id = get_theme_mod( 'custom_logo' );
     if ( $logo_id ) {
-        $logo_url = wp_get_attachment_image_url( $logo_id, 'full' );
-        $output   = '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="site-logo-img">';
+        // Utilise la taille chg-logo (200×60, proportionnel)
+        // Fallback sur full si la taille n'a pas encore été générée
+        $logo_url = wp_get_attachment_image_url( $logo_id, 'chg-logo' );
+        if ( ! $logo_url ) {
+            $logo_url = wp_get_attachment_image_url( $logo_id, 'full' );
+        }
+        $output = '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="site-logo-img" width="200" height="60" loading="eager">';
     } else {
         $output = '<span class="site-logo-text">' . esc_html( get_bloginfo( 'name' ) ) . '</span>';
     }
