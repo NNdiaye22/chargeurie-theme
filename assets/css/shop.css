@@ -1,0 +1,86 @@
+/* ═════════════════════════════════════
+   BOUTIQUE + FICHE PRODUIT — Chargeurie
+═════════════════════════════════════ */
+
+/* Hero boutique */
+.chg-shop { padding-top: 28px; }
+.shop-hero { background: var(--ink); padding: 14rem 6vw 8rem; overflow: hidden; position: relative; }
+.shop-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 70% at 80% 50%, rgba(0,113,227,.18) 0%, transparent 70%); pointer-events: none; }
+.shop-hero-inner { position: relative; z-index: 2; max-width: 700px; }
+.shop-hero-tag   { font-size: .52rem; letter-spacing: .55em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 1.5rem; }
+.shop-hero-title { font-size: clamp(4rem,11vw,11rem); font-weight: 900; letter-spacing: -.04em; line-height: .9; text-transform: uppercase; }
+.shop-hero-title .solid   { display: block; color: var(--white); }
+.shop-hero-title .outline { display: block; -webkit-text-stroke: 2px rgba(255,255,255,.2); color: transparent; }
+.shop-hero-sub   { font-size: .88rem; color: rgba(255,255,255,.45); line-height: 1.9; max-width: 440px; margin-top: 2.5rem; }
+
+/* Barre filtres */
+.shop-bar { display: flex; align-items: center; justify-content: space-between; padding-top: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--mid); }
+.shop-bar .woocommerce-result-count { font-size: .62rem; letter-spacing: .3em; text-transform: uppercase; color: var(--stone); margin: 0; }
+.shop-bar .orderby { border: 1.5px solid var(--mid); border-radius: 999px; padding: .5rem 1.2rem; font-size: .65rem; font-family: inherit; color: var(--ink); outline: none; background: var(--white); cursor: pointer; }
+
+/* Grille */
+.shop-content { padding-top: 3rem; padding-bottom: 8rem; }
+.shop-grid    { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
+.shop-pagination { margin-top: 4rem; display: flex; justify-content: center; }
+.shop-pagination .page-numbers { display: flex; gap: .8rem; list-style: none; }
+.shop-pagination .page-numbers a,.shop-pagination .page-numbers span { width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:.65rem;font-weight:600;color:var(--stone);border:1.5px solid var(--mid);transition:all .3s; }
+.shop-pagination .page-numbers .current,.shop-pagination .page-numbers a:hover { background:var(--ink);color:var(--white);border-color:var(--ink); }
+.shop-empty { text-align:center;padding:8rem 0; }
+.shop-empty-text { font-size:1rem;color:var(--stone);margin-bottom:2.5rem; }
+@media(max-width:900px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.shop-grid{grid-template-columns:1fr;}}
+
+/* Fiche produit */
+.chg-single-product { padding-top: calc(28px + 8rem); padding-bottom: 8rem; }
+.sp-container { display:grid;grid-template-columns:1fr 1fr;gap:6vw;align-items:start;margin-bottom:8rem; }
+
+/* Galerie */
+.sp-gallery { position:sticky;top:10rem; }
+.sp-img-main { border-radius:var(--radius-lg);overflow:hidden;background:var(--off);aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative; }
+.sp-main-img { width:100%;height:100%;object-fit:contain;transition:opacity .3s; }
+.sp-img-placeholder { font-size:4rem;opacity:.15; }
+.sp-badge { position:absolute;top:1.2rem;left:1.2rem;font-size:.46rem;letter-spacing:.35em;text-transform:uppercase;padding:.3rem .7rem;border-radius:999px;font-weight:700;z-index:2; }
+.sp-thumbs { display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap; }
+.sp-thumb { border:2px solid transparent;border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;opacity:.6;transition:opacity .3s,border-color .3s;padding:0;background:none;width:72px;height:72px; }
+.sp-thumb img { width:100%;height:100%;object-fit:cover; }
+.sp-thumb:hover,.sp-thumb.active { opacity:1;border-color:var(--blue); }
+
+/* Résumé */
+.sp-breadcrumb { display:flex;align-items:center;gap:.6rem;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem; }
+.sp-breadcrumb a { color:var(--stone);transition:color .3s; }
+.sp-breadcrumb a:hover { color:var(--blue); }
+.sp-title  { font-size:clamp(1.8rem,3vw,3.2rem);font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1.05;margin-bottom:1.5rem; }
+.sp-price  { font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:2rem; }
+.sp-price del .woocommerce-Price-amount { color:var(--stone);font-weight:400;font-size:.75em; }
+.sp-short-desc { font-size:.88rem;color:var(--stone);line-height:1.9;margin-bottom:2.5rem; }
+
+/* Formulaire */
+.sp-form { margin-bottom:2.5rem; }
+.sp-form .quantity { display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem; }
+.sp-form .qty { width:60px;border:1.5px solid var(--mid);border-radius:var(--radius-sm);padding:.6rem .8rem;font-size:.9rem;text-align:center;font-family:inherit; }
+.sp-form .single_add_to_cart_button { width:100%;padding:1.1rem;border-radius:999px;background:var(--ink);color:var(--white);border:none;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;font-family:inherit;transition:background .3s,transform .2s; }
+.sp-form .single_add_to_cart_button:hover { background:var(--blue);transform:scale(1.02); }
+.sp-form .variations { width:100%;border-collapse:collapse;margin-bottom:1.2rem; }
+.sp-form .variations td,.sp-form .variations th { padding:.5rem 0;vertical-align:middle; }
+.sp-form .variations .label label { font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--stone); }
+.sp-form .variations select { border:1.5px solid var(--mid);border-radius:999px;padding:.5rem 1.2rem;font-size:.75rem;font-family:inherit;color:var(--ink);outline:none;background:var(--white);cursor:pointer; }
+
+/* Réassurance */
+.sp-trust { list-style:none;display:flex;flex-direction:column;gap:.9rem;margin-bottom:2.5rem; }
+.sp-trust li { display:flex;align-items:center;gap:.8rem;font-size:.78rem;color:var(--stone); }
+.trust-icon { font-size:1rem;flex-shrink:0; }
+.sp-trust strong { color:var(--ink); }
+
+/* Accordéon */
+.sp-accordion { border-top:1px solid var(--mid);padding:1.2rem 0; }
+.sp-accordion-title { font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center; }
+.sp-accordion-title::after { content:'+';font-size:1rem;font-weight:300; }
+.sp-accordion[open] .sp-accordion-title::after { content:'−'; }
+.sp-accordion-body { padding-top:1rem;font-size:.82rem;color:var(--stone);line-height:1.9; }
+
+/* Produits associés */
+.sp-related { margin-bottom:6rem; }
+.sp-related-header { display:flex;align-items:baseline;gap:1.5rem;margin-bottom:3rem; }
+.sp-related-title { font-size:clamp(1.5rem,3vw,2.5rem);font-weight:800;letter-spacing:-.03em;color:var(--ink); }
+
+@media(max-width:900px) { .sp-container{grid-template-columns:1fr;} .sp-gallery{position:static;} }
