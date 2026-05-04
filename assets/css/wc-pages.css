@@ -1,11 +1,11 @@
-/* WooCommerce pages — Chargeurie v2 */
+/* WooCommerce pages — Chargeurie v3 */
 
 /* ══════════════════════════════════════════
    FICHE PRODUIT
 ══════════════════════════════════════════ */
 
 .chg-single-product {
-  padding-top: calc(28px + 88px); /* ticker + nav */
+  padding-top: calc(28px + 88px);
   padding-bottom: 8rem;
   background: var(--white);
 }
@@ -151,7 +151,6 @@
 /* ── Form WooCommerce ─── */
 .sp-form { margin-bottom: 2rem; }
 
-/* Variations */
 .sp-form .variations {
   width: 100%;
   border: none;
@@ -192,7 +191,6 @@
   border-color: var(--ink);
 }
 
-/* Reset variation */
 .sp-form .reset_variations {
   display: inline-block;
   margin-top: .5rem;
@@ -204,7 +202,6 @@
 }
 .sp-form .reset_variations:hover { color: var(--ink); }
 
-/* Prix variation */
 .sp-form .woocommerce-variation-price { margin: .8rem 0 1.2rem; }
 .sp-form .woocommerce-variation-price .woocommerce-Price-amount {
   font-size: 1.4rem;
@@ -213,7 +210,6 @@
   letter-spacing: -.02em;
 }
 
-/* Row qty + CTA */
 .sp-form .woocommerce-variation-add-to-cart,
 .sp-form form.cart {
   display: flex;
@@ -272,7 +268,7 @@
   cursor: not-allowed !important;
 }
 
-/* ── Trust strip (3 items, colonne unique) ─── */
+/* ── Trust strip ─── */
 .sp-trust {
   list-style: none;
   display: grid;
@@ -304,34 +300,72 @@
   color: var(--ink);
 }
 
-/* ── Attributs produit ─── */
+/* ════════════════════════════════════════════════
+   CARACTÉRISTIQUES — version premium
+   Tableau 2 colonnes épuré, fond alternant très doux
+════════════════════════════════════════════════ */
+.sp-accordion-body--attrs {
+  padding: 0;            /* on laisse le tableau gérer son padding interne */
+}
+
 .sp-attrs-list {
-  display: flex;
-  flex-direction: column;
+  display: table;
+  width: 100%;
+  border-spacing: 0;
 }
+
 .sp-attr-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: .75rem 0;
-  border-bottom: 1px solid var(--mid);
+  display: table-row;
 }
-.sp-attr-row:last-child { border-bottom: none; }
+
+/* Fond alterné très léger — zebre subtil */
+.sp-attr-row:nth-child(odd) dt,
+.sp-attr-row:nth-child(odd) dd {
+  background: color-mix(in srgb, var(--off) 60%, var(--white));
+}
+.sp-attr-row:nth-child(even) dt,
+.sp-attr-row:nth-child(even) dd {
+  background: var(--white);
+}
+
+.sp-attr-row dt,
+.sp-attr-row dd {
+  display: table-cell;
+  padding: .9rem 1.2rem;
+  vertical-align: middle;
+  border-bottom: 1px solid color-mix(in srgb, var(--mid) 50%, transparent);
+}
+
+/* Dernière ligne : pas de bordure basse */
+.sp-attr-row:last-child dt,
+.sp-attr-row:last-child dd { border-bottom: none; }
+
+/* Première ligne : léger arrondi en haut */
+.sp-attr-row:first-child dt { border-radius: var(--radius-sm) 0 0 0; }
+.sp-attr-row:first-child dd { border-radius: 0 var(--radius-sm) 0 0; }
+
+/* Dernière ligne : arrondi en bas */
+.sp-attr-row:last-child dt { border-radius: 0 0 0 var(--radius-sm); }
+.sp-attr-row:last-child dd { border-radius: 0 0 var(--radius-sm) 0; }
+
 .sp-attr-row dt {
-  font-size: .5rem;
-  letter-spacing: .35em;
+  font-size: .48rem;
+  letter-spacing: .4em;
   text-transform: uppercase;
   color: var(--stone);
   font-weight: 600;
-  flex-shrink: 0;
+  width: 42%;                /* colonne label ~42 % */
+  white-space: nowrap;
 }
+
 .sp-attr-row dd {
   margin: 0;
-  color: var(--ink);
-  font-size: .8rem;
+  font-size: .82rem;
   font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -.01em;
   text-align: right;
+  padding-right: 1.4rem;
 }
 
 /* ── Accordions ─── */
@@ -362,7 +396,7 @@
   flex-shrink: 0;
   margin-left: 1rem;
 }
-details[open] .sp-accordion-title::after { content: '\2212'; } /* minus sign */
+details[open] .sp-accordion-title::after { content: '\2212'; }
 
 .sp-accordion-body {
   padding: 0 0 1.5rem;
@@ -406,6 +440,9 @@ details[open] .sp-accordion-title::after { content: '\2212'; } /* minus sign */
   .sp-form form.cart { flex-direction: column; align-items: stretch; }
   .sp-form .quantity { justify-content: center; }
   .sp-related { margin-top: 5rem; }
+  /* Attrs : colonne label plus compacte sur mobile */
+  .sp-attr-row dt { width: 48%; font-size: .42rem; }
+  .sp-attr-row dd { font-size: .76rem; }
 }
 
 /* ══════════════════════════════════════════

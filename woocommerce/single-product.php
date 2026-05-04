@@ -1,7 +1,7 @@
 <?php
 /**
  * Chargeurie — woocommerce/single-product.php
- * Fiche produit premium v2 — sans emoji
+ * Fiche produit premium v3
  */
 get_header();
 while ( have_posts() ) :
@@ -31,14 +31,20 @@ while ( have_posts() ) :
 
       <?php $gallery_ids = $product->get_gallery_image_ids(); ?>
       <?php if (!empty($gallery_ids)) : ?>
-        <div class="sp-thumbs">
+        <div class="sp-thumbs" id="spThumbs">
           <?php if ($image_id) : ?>
-            <button class="sp-thumb active" data-full="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'chg-product-featured')); ?>" aria-label="Image principale">
+            <button class="sp-thumb active"
+              data-full="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'chg-product-featured')); ?>"
+              data-id="<?php echo esc_attr($image_id); ?>"
+              aria-label="Image principale">
               <?php echo wp_get_attachment_image($image_id, [80,80]); ?>
             </button>
           <?php endif; ?>
           <?php foreach ($gallery_ids as $gid) : ?>
-            <button class="sp-thumb" data-full="<?php echo esc_url(wp_get_attachment_image_url($gid, 'chg-product-featured')); ?>" aria-label="Vue alternative">
+            <button class="sp-thumb"
+              data-full="<?php echo esc_url(wp_get_attachment_image_url($gid, 'chg-product-featured')); ?>"
+              data-id="<?php echo esc_attr($gid); ?>"
+              aria-label="Vue alternative">
               <?php echo wp_get_attachment_image($gid, [80,80]); ?>
             </button>
           <?php endforeach; ?>
@@ -90,7 +96,6 @@ while ( have_posts() ) :
       </ul>
 
       <?php
-      // Attributs produit visibles (hors variations)
       $sp_attributes = array_filter(
         $product->get_attributes(),
         fn($a) => $a->get_visible()
@@ -99,7 +104,7 @@ while ( have_posts() ) :
       ?>
       <details class="sp-accordion" open>
         <summary class="sp-accordion-title">Caractéristiques</summary>
-        <div class="sp-accordion-body">
+        <div class="sp-accordion-body sp-accordion-body--attrs">
           <dl class="sp-attrs-list">
             <?php foreach ( $sp_attributes as $attribute ) :
               $attr_name = wc_attribute_label( $attribute->get_name(), $product );
@@ -190,16 +195,54 @@ while ( have_posts() ) :
 
 <script>
 (function(){
-  var thumbs = document.querySelectorAll('.sp-thumb');
-  var mainImg = document.getElementById('spMainImg');
+  var mainImg  = document.getElementById('spMainImg');
+  var thumbs   = document.querySelectorAll('.sp-thumb');
+
+  /* ── Clic miniature ── */
+  function setMainImg(src) {
+    if (!mainImg) return;
+    mainImg.style.opacity = '0';
+    mainImg.src = src;
+    mainImg.onload = function(){ mainImg.style.opacity = '1'; };
+  }
+
   thumbs.forEach(function(btn){
     btn.addEventListener('click', function(){
       thumbs.forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
-      if (mainImg) {
-        mainImg.style.opacity = '0';
-        mainImg.src = btn.dataset.full;
-        mainImg.onload = function(){ mainImg.style.opacity = '1'; };
+      setMainImg(btn.dataset.full);
+    });
+  });
+
+  /* ── Swap image sur sélection de variation (WooCommerce) ── */
+  document.addEventListener('DOMContentLoaded', function(){
+    var form = document.querySelector('form.variations_form');
+    if (!form) return;
+
+    // found_variation : WC fournit l'image de la variation
+    jQuery(form).on('found_variation', function(e, variation){
+      if (variation.image && variation.image.full_src && variation.image.full_src !== '') {
+        var newSrc = variation.image.full_src;
+        // Met à jour l'image principale
+        setMainImg(newSrc);
+        // Met à jour (ou ajoute) la miniature active
+        thumbs.forEach(function(b){ b.classList.remove('active'); });
+        var matched = Array.from(thumbs).find(function(b){
+          return b.dataset.full === newSrc;
+        });
+        if (matched) {
+          matched.classList.add('active');
+        }
+      }
+    });
+
+    // reset_data : on revient à l'image produit d'origine
+    jQuery(form).on('reset_data', function(){
+      var firstThumb = thumbs[0];
+      if (firstThumb) {
+        thumbs.forEach(function(b){ b.classList.remove('active'); });
+        firstThumb.classList.add('active');
+        setMainImg(firstThumb.dataset.full);
       }
     });
   });

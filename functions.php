@@ -23,6 +23,22 @@ add_filter( 'woocommerce_variable_price_html', function( $price, $product ) {
     return sprintf( 'A partir de %s', $min );
 }, 10, 2 );
 
+// ── Masquer le stock restant côté client ─────────────
+// Supprime le message «X en stock» de WooCommerce partout sauf Admin
+add_filter( 'woocommerce_get_availability', function( $availability, $product ) {
+    if ( ! is_admin() ) {
+        // On conserve uniquement le statut En stock / Épuisé, sans le chiffre
+        if ( isset( $availability['availability'] ) ) {
+            $txt = $availability['availability'];
+            // Si le message contient un chiffre, on le remplace par un label générique
+            if ( preg_match( '/\d/', $txt ) ) {
+                $availability['availability'] = __( 'Stock limité', 'chargeurie' );
+            }
+        }
+    }
+    return $availability;
+}, 20, 2 );
+
 // ── Badge produit ──────────────────────────────
 function chg_card_badge( $product ) {
     if ( ! $product ) return null;
@@ -56,7 +72,7 @@ function chg_card_badge( $product ) {
 
     if ( ! $in_stock && $backorders ) return [ 'id' => 'backorder', 'label' => 'Bient&ocirc;t dispo' ];
     if ( ! $in_stock )                return [ 'id' => 'out',       'label' => '&Eacute;puis&eacute;' ];
-    if ( $low_stock )                 return [ 'id' => 'low',       'label' => 'Plus que ' . (int) $stock_qty . ' en stock' ];
+    if ( $low_stock )                 return [ 'id' => 'low',       'label' => 'Stock limit&eacute;' ]; /* sans chiffre */
     if ( $sale_price )                return [ 'id' => 'promo',     'label' => 'Promo' ];
     return null;
 }
@@ -98,8 +114,7 @@ function chg_theme_setup() {
     ] );
     add_theme_support( 'automatic-feed-links' );
 
-    // Tailles d'images personnalisées
-    add_image_size( 'chg-logo',             200,  60,   false ); // Logo nav — proportionnel
+    add_image_size( 'chg-logo',             200,  60,   false );
     add_image_size( 'chg-product-card',     600,  800,  true  );
     add_image_size( 'chg-product-featured', 900,  1200, true  );
     add_image_size( 'chg-hero',             1920, 1080, true  );
@@ -131,8 +146,6 @@ add_action( 'widgets_init', 'chg_widgets_init' );
 function chg_the_logo( $return = false ) {
     $logo_id = get_theme_mod( 'custom_logo' );
     if ( $logo_id ) {
-        // Utilise la taille chg-logo (200×60, proportionnel)
-        // Fallback sur full si la taille n'a pas encore été générée
         $logo_url = wp_get_attachment_image_url( $logo_id, 'chg-logo' );
         if ( ! $logo_url ) {
             $logo_url = wp_get_attachment_image_url( $logo_id, 'full' );
