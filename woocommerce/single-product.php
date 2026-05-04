@@ -1,7 +1,7 @@
 <?php
 /**
- * Chargeurie — single-product.php v10.1
- * found_variation sur $(document) — fix image swap — PHP 7.0+ compat
+ * Chargeurie — single-product.php v10.2
+ * PHP 5.6+ compat — pas de fn(), pas de ??, pas de [] courts
  */
 get_header();
 while ( have_posts() ) : the_post();
@@ -33,11 +33,11 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
     <!-- GALERIE -->
     <div class="sp-gallery">
       <div class="sp-main-frame" id="spFrame">
-        <?php if ( $badge ) : ?>
+        <?php if ( $badge ) { ?>
           <span class="sp-badge badge-<?php echo esc_attr($badge['id']); ?>"><?php echo $badge['label']; ?></span>
-        <?php endif; ?>
+        <?php } ?>
 
-        <?php if ( $image_id ) :
+        <?php if ( $image_id ) {
           $img_src = wp_get_attachment_image_url( $image_id, 'large' );
         ?>
           <img
@@ -46,9 +46,9 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
             src="<?php echo esc_url($img_src); ?>"
             alt="<?php echo esc_attr(get_the_title()); ?>"
             width="600" height="600"
-            loading="eager" fetchpriority="high"
+            loading="eager"
           >
-        <?php else : ?>
+        <?php } else { ?>
           <div class="sp-no-img" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1">
               <rect x="4" y="4" width="40" height="40" rx="4"/>
@@ -56,27 +56,29 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
               <path d="M4 34l11-11 8 8 7-7 14 14"/>
             </svg>
           </div>
-        <?php endif; ?>
+        <?php } ?>
       </div>
 
-      <?php if ( count($all_images) > 1 ) : ?>
+      <?php if ( count($all_images) > 1 ) { ?>
       <div class="sp-thumbs" role="tablist" aria-label="Vues">
-        <?php foreach ( $all_images as $i => $img_id ) :
+        <?php foreach ( $all_images as $i => $img_id ) {
           $full_url  = wp_get_attachment_image_url( $img_id, 'large' );
           $thumb_url = wp_get_attachment_image_url( $img_id, 'thumbnail' );
+          $active    = ( $i === 0 ) ? 'is-active' : '';
+          $selected  = ( $i === 0 ) ? 'true' : 'false';
         ?>
           <button
-            class="sp-thumb <?php echo $i === 0 ? 'is-active' : ''; ?>"
+            class="sp-thumb <?php echo $active; ?>"
             role="tab"
-            aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"
+            aria-selected="<?php echo $selected; ?>"
             data-full="<?php echo esc_url($full_url); ?>"
             data-thumb="<?php echo esc_url($thumb_url); ?>"
             aria-label="Image <?php echo esc_attr($i + 1); ?>">
             <img src="<?php echo esc_url($thumb_url); ?>" alt="" width="68" height="68" loading="lazy">
           </button>
-        <?php endforeach; ?>
+        <?php } ?>
       </div>
-      <?php endif; ?>
+      <?php } ?>
     </div><!-- /sp-gallery -->
 
     <!-- PANNEAU ACHAT -->
@@ -92,25 +94,29 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
 
       <h1 class="sp-title"><?php the_title(); ?></h1>
 
-      <?php if ( wc_reviews_enabled() && $rating_cnt > 0 ) : ?>
+      <?php if ( wc_reviews_enabled() && $rating_cnt > 0 ) { ?>
       <div class="sp-stars-row">
         <span class="sp-stars" aria-hidden="true"><?php
-          for ( $s = 1; $s <= 5; $s++ ) :
-            if     ( $s <= floor($avg) ) echo '<svg class="star star-on" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
-            elseif ( $s <= $avg + 0.5 ) echo '<svg class="star star-half" viewBox="0 0 16 16"><path d="M8 1v9.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
-            else                        echo '<svg class="star star-off" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
-          endfor;
+          for ( $s = 1; $s <= 5; $s++ ) {
+            if ( $s <= floor($avg) ) {
+              echo '<svg class="star star-on" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
+            } elseif ( $s <= $avg + 0.5 ) {
+              echo '<svg class="star star-half" viewBox="0 0 16 16"><path d="M8 1v9.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
+            } else {
+              echo '<svg class="star star-off" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+            }
+          }
         ?></span>
         <span class="sp-review-count"><?php echo esc_html($rating_cnt); ?> avis</span>
       </div>
-      <?php endif; ?>
+      <?php } ?>
 
       <div id="spPriceBase"><?php echo $base_price_html; ?></div>
       <div id="spPriceVariant" style="display:none" aria-live="polite"></div>
 
-      <?php if ( $short_desc ) : ?>
+      <?php if ( $short_desc ) { ?>
         <div class="sp-short"><?php echo wp_kses_post($short_desc); ?></div>
-      <?php endif; ?>
+      <?php } ?>
 
       <div class="sp-form" id="spForm">
         <?php woocommerce_template_single_add_to_cart(); ?>
@@ -127,8 +133,8 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
   </div><!-- /sp-wrap -->
 </section>
 
-<!-- CARACTÉRISTIQUES ------------------------------------------------------ -->
-<?php if ( ! empty($attributes) ) : ?>
+<!-- CARACTÉRISTIQUES -->
+<?php if ( ! empty($attributes) ) { ?>
 <section class="sp-specs">
   <div class="sp-container">
     <div class="sp-section-head">
@@ -136,34 +142,34 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
       <h2 class="sp-section-title">Caract&eacute;ristiques</h2>
     </div>
     <dl class="sp-specs-grid">
-      <?php foreach ( $attributes as $attribute ) :
+      <?php foreach ( $attributes as $attribute ) {
         $label = wc_attribute_label( $attribute->get_name(), $product );
         if ( $attribute->is_taxonomy() ) {
           $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), array('fields'=>'names') );
-          $val   = (!is_wp_error($terms) && !empty($terms)) ? implode(', ', $terms) : '';
+          $val   = ( ! is_wp_error($terms) && ! empty($terms) ) ? implode(', ', $terms) : '';
         } else {
           $opts = $attribute->get_options();
-          $val  = !empty($opts) ? implode(', ', $opts) : '';
+          $val  = ! empty($opts) ? implode(', ', $opts) : '';
         }
-        if (!$val) continue;
+        if ( ! $val ) continue;
       ?>
         <div class="sp-spec"><dt><?php echo esc_html($label); ?></dt><dd><?php echo esc_html($val); ?></dd></div>
-      <?php endforeach; ?>
+      <?php } ?>
     </dl>
   </div>
 </section>
-<?php endif; ?>
+<?php } ?>
 
-<!-- DESCRIPTION + FAQ ----------------------------------------------------- -->
+<!-- DESCRIPTION + FAQ -->
 <section class="sp-details">
   <div class="sp-container sp-details-inner">
-    <?php if ( $long_desc ) : ?>
+    <?php if ( $long_desc ) { ?>
     <div class="sp-desc">
       <span class="sp-tag">Description</span>
       <h2 class="sp-section-title sp-section-title--sm">D&eacute;tails</h2>
       <div class="sp-desc-body"><?php echo wp_kses_post($long_desc); ?></div>
     </div>
-    <?php endif; ?>
+    <?php } ?>
     <div class="sp-faq <?php echo $long_desc ? '' : 'sp-faq--full'; ?>">
       <div class="sp-acc-list">
         <div class="sp-acc">
@@ -183,10 +189,10 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
   </div>
 </section>
 
-<!-- PRODUITS ASSOCIÉS ---------------------------------------------------- -->
+<!-- PRODUITS ASSOCIÉS -->
 <?php
 $related = wc_get_related_products( $product->get_id(), 3 );
-if ( !empty($related) ) :
+if ( ! empty($related) ) {
 ?>
 <section class="sp-related">
   <div class="sp-container">
@@ -195,17 +201,28 @@ if ( !empty($related) ) :
       <h2 class="sp-section-title">Dans la gamme</h2>
     </div>
     <div class="products-grid">
-      <?php foreach ( $related as $rid ) :
+      <?php foreach ( $related as $rid ) {
         $rp = wc_get_product($rid);
-        if (!$rp || !$rp->is_visible()) continue;
-        $rb  = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
+        if ( ! $rp || ! $rp->is_visible() ) continue;
+        $rb   = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
         $rtid = $rp->get_image_id();
       ?>
         <article class="product-card" data-product-id="<?php echo esc_attr($rid); ?>">
           <a class="card-img-wrap" href="<?php echo esc_url(get_permalink($rid)); ?>" tabindex="-1" aria-hidden="true">
-            <?php if ($rb) : ?><div class="card-badge badge-<?php echo esc_attr($rb['id']); ?>"><?php echo $rb['label']; ?></div><?php endif; ?>
-            <?php if ($rtid) echo wp_get_attachment_image($rtid,'chg-product-card',false,array('class'=>'slide-product-img','loading'=>'lazy'));
-            else : ?><div class="card-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><?php endif; ?>
+            <?php if ( $rb ) { ?>
+              <div class="card-badge badge-<?php echo esc_attr($rb['id']); ?>"><?php echo $rb['label']; ?></div>
+            <?php } ?>
+            <?php if ( $rtid ) {
+              echo wp_get_attachment_image( $rtid, 'chg-product-card', false, array('class'=>'slide-product-img','loading'=>'lazy') );
+            } else { ?>
+              <div class="card-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" width="36" height="36">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+            <?php } ?>
           </a>
           <div class="card-info">
             <h3 class="card-name"><a href="<?php echo esc_url(get_permalink($rid)); ?>"><?php echo esc_html($rp->get_name()); ?></a></h3>
@@ -215,18 +232,20 @@ if ( !empty($related) ) :
             </div>
           </div>
         </article>
-      <?php endforeach; ?>
+      <?php } ?>
     </div>
   </div>
 </section>
-<?php endif; ?>
+<?php } ?>
 
 </div><!-- /sp-page -->
 
-<!-- STICKY BAR ----------------------------------------------------------- -->
+<!-- STICKY BAR -->
 <div class="sp-sticky" id="spSticky" aria-hidden="true">
   <div class="sp-sticky-in">
-    <?php if ($image_id) echo wp_get_attachment_image($image_id,array(44,44),false,array('class'=>'sp-sticky-img','id'=>'spStickyImg','loading'=>'lazy')); ?>
+    <?php if ( $image_id ) {
+      echo wp_get_attachment_image( $image_id, array(44,44), false, array('class'=>'sp-sticky-img','id'=>'spStickyImg','loading'=>'lazy') );
+    } ?>
     <span class="sp-sticky-name"><?php the_title(); ?></span>
     <span class="sp-sticky-price" id="spStickyPrice"><?php echo $base_price_html; ?></span>
     <button class="sp-sticky-btn" id="spStickyBtn" type="button">Ajouter au panier</button>
@@ -252,7 +271,6 @@ if ( !empty($related) ) :
     var baseImgSrc    = <?php echo json_encode( (string)$main_img_url ); ?>;
     var basePriceHTML = $priceBase.html();
 
-    /* SWAP IMAGE : supprime srcset pour eviter override navigateur */
     function swapImg(src, $activeThumb) {
       if (!src || !imgEl) return;
       imgEl.style.opacity = '0';
@@ -269,28 +287,20 @@ if ( !empty($related) ) :
       }
     }
 
-    /* Clic miniature */
     $thumbs.on('click', function() {
       swapImg($(this).data('full'), $(this));
     });
 
-    /* found_variation ecoute sur $(document) — pattern correct WooCommerce 3+ */
     $(document).on('found_variation.chg', function(e, variation) {
-      console.log('[CHG] found_variation:', variation);
-
-      var img = variation.image || {};
-      console.log('[CHG] image object:', img);
-
+      console.log('[CHG] found_variation', variation);
+      var img    = variation.image || {};
       var newSrc = img.url || img.full_src || img.src || '';
-
       if (newSrc && newSrc !== window.location.href) {
         swapImg(newSrc, null);
         if ($stickyImg.length) {
           $stickyImg.attr('src', img.thumb_src || img.src || newSrc);
         }
       }
-
-      /* PRIX */
       var priceHtml = variation.price_html || '';
       if (priceHtml) {
         $priceBase.hide();
@@ -300,9 +310,9 @@ if ( !empty($related) ) :
     });
 
     $(document).on('reset_data.chg', function() {
-      console.log('[CHG] reset_data');
       var $first = $thumbs.first();
-      swapImg(baseImgSrc || ($first.length ? $first.data('full') : '') || '', $first.length ? $first : null);
+      var resetSrc = baseImgSrc || ($first.length ? $first.data('full') : '');
+      swapImg(resetSrc, $first.length ? $first : null);
       if ($stickyImg.length && $first.length) {
         $stickyImg.attr('src', $first.data('thumb') || '');
       }
@@ -311,7 +321,6 @@ if ( !empty($related) ) :
       $stickyPrice.html(basePriceHTML);
     });
 
-    /* STICKY BAR */
     if ($spFormWrap.length && $sticky.length) {
       var io = new IntersectionObserver(function(entries) {
         var hidden = !entries[0].isIntersecting;
@@ -322,11 +331,13 @@ if ( !empty($related) ) :
 
     $stickyBtn.on('click', function() {
       var $btn = $spFormWrap.find('.single_add_to_cart_button:not(.disabled)').first();
-      if ($btn.length) $btn.trigger('click');
-      else if ($spFormWrap[0]) $spFormWrap[0].scrollIntoView({ behavior:'smooth', block:'center' });
+      if ($btn.length) {
+        $btn.trigger('click');
+      } else if ($spFormWrap[0]) {
+        $spFormWrap[0].scrollIntoView({ behavior:'smooth', block:'center' });
+      }
     });
 
-    /* ACCORDIONS */
     $('.sp-acc-btn').on('click', function() {
       var $btn   = $(this);
       var isOpen = $btn.attr('aria-expanded') === 'true';
@@ -334,34 +345,35 @@ if ( !empty($related) ) :
       if (!$panel.length) return;
 
       $('.sp-acc-btn[aria-expanded="true"]').not($btn).each(function() {
-        var $ob = $(this), $op = $('#' + $ob.attr('aria-controls'));
-        $ob.attr('aria-expanded','false');
-        $op.css({ height:$op[0].scrollHeight+'px', overflow:'hidden' });
-        requestAnimationFrame(function(){
-          $op.css({ transition:'height .3s ease, opacity .25s', height:'0', opacity:'0' });
-          $op.one('transitionend', function(){ $op.prop('hidden',true).css('',''); });
+        var $ob = $(this);
+        var $op = $('#' + $ob.attr('aria-controls'));
+        $ob.attr('aria-expanded', 'false');
+        $op.css({ height: $op[0].scrollHeight + 'px', overflow: 'hidden' });
+        requestAnimationFrame(function() {
+          $op.css({ transition: 'height .3s ease, opacity .25s', height: '0', opacity: '0' });
+          $op.one('transitionend', function() { $op.prop('hidden', true).css('', ''); });
         });
       });
 
       if (isOpen) {
-        $btn.attr('aria-expanded','false');
-        $panel.css({ height:$panel[0].scrollHeight+'px', overflow:'hidden' });
-        requestAnimationFrame(function(){
-          $panel.css({ transition:'height .3s ease, opacity .25s', height:'0', opacity:'0' });
-          $panel.one('transitionend', function(){ $panel.prop('hidden',true).css('',''); });
+        $btn.attr('aria-expanded', 'false');
+        $panel.css({ height: $panel[0].scrollHeight + 'px', overflow: 'hidden' });
+        requestAnimationFrame(function() {
+          $panel.css({ transition: 'height .3s ease, opacity .25s', height: '0', opacity: '0' });
+          $panel.one('transitionend', function() { $panel.prop('hidden', true).css('', ''); });
         });
       } else {
-        $btn.attr('aria-expanded','true');
-        $panel.prop('hidden',false).css({ height:'0', opacity:'0', overflow:'hidden' });
+        $btn.attr('aria-expanded', 'true');
+        $panel.prop('hidden', false).css({ height: '0', opacity: '0', overflow: 'hidden' });
         var h = $panel[0].scrollHeight;
-        requestAnimationFrame(function(){
-          $panel.css({ transition:'height .3s ease, opacity .25s', height:h+'px', opacity:'1' });
-          $panel.one('transitionend', function(){ $panel.css({ height:'', overflow:'' }); });
+        requestAnimationFrame(function() {
+          $panel.css({ transition: 'height .3s ease, opacity .25s', height: h + 'px', opacity: '1' });
+          $panel.one('transitionend', function() { $panel.css({ height: '', overflow: '' }); });
         });
       }
     });
 
-  }); // ready
+  });
 
 })(jQuery);
 </script>
