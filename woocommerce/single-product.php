@@ -1,439 +1,423 @@
 <?php
 /**
- * Chargeurie — woocommerce/single-product.php
- * Fiche produit premium v5 — conversion-first
+ * Chargeurie — single-product.php v6
+ * Page produit conversion-first
+ * Variables thème : --ink --off --mid --stone --blue --blue2 --white --radius-*
  */
 get_header();
-while ( have_posts() ) :
-  the_post();
-  global $product;
+while ( have_posts() ) : the_post();
+global $product;
 
-  $badge      = function_exists('chg_card_badge') ? chg_card_badge($product) : null;
-  $image_id   = $product->get_image_id();
-  $gallery    = $product->get_gallery_image_ids();
-  $short      = $product->get_short_description();
-  $desc       = $product->get_description();
-  $attrs      = array_filter( $product->get_attributes(), fn($a) => $a->get_visible() );
-  $rating_cnt = $product->get_rating_count();
-  $avg_rating = $product->get_average_rating();
+$image_id   = $product->get_image_id();
+$gallery    = $product->get_gallery_image_ids();
+$short_desc = $product->get_short_description();
+$long_desc  = $product->get_description();
+$attributes = array_filter( $product->get_attributes(), fn($a) => $a->get_visible() );
+$rating_cnt = $product->get_rating_count();
+$avg        = (float) $product->get_average_rating();
+$badge      = function_exists('chg_card_badge') ? chg_card_badge($product) : null;
+
+// Toutes les images de galerie (principale + galerie)
+$all_images = [];
+if ( $image_id ) $all_images[] = $image_id;
+foreach ( $gallery as $gid ) $all_images[] = $gid;
 ?>
 
-<main class="chg-sp" data-sp>
+<div class="sp-page">
 
-  <!-- ── HERO : galerie (fond sombre) + résumé achat ──────────────────── -->
-  <section class="sp-hero">
-    <div class="sp-hero-inner chg-container-xl">
+<!-- ────────────────────────────────────────────────
+     SECTION PRINCIPALE : Galerie + Acheter
+──────────────────────────────────────────────── -->
+<section class="sp-hero">
+  <div class="sp-wrap">
 
-      <!-- Galerie (col gauche) -->
-      <div class="sp-col-gallery" role="region" aria-label="Galerie produit">
+    <!-- GALERIE -->
+    <div class="sp-gallery">
 
-        <div class="sp-img-wrap">
-          <?php if ($badge) : ?>
-            <span class="sp-badge badge-<?php echo esc_attr($badge['id']); ?>" aria-label="<?php echo esc_attr(strip_tags($badge['label'])); ?>">
-              <?php echo $badge['label']; ?>
-            </span>
-          <?php endif; ?>
+      <!-- Image principale -->
+      <div class="sp-main-frame" id="spFrame">
+        <?php if ( $badge ) : ?>
+          <span class="sp-badge badge-<?php echo esc_attr($badge['id']); ?>">
+            <?php echo $badge['label']; ?>
+          </span>
+        <?php endif; ?>
 
-          <?php if ($image_id) : ?>
-            <?php echo wp_get_attachment_image( $image_id, 'chg-product-featured', false, [
-              'class'   => 'sp-main-img',
-              'id'      => 'spMainImg',
-              'loading' => 'eager',
-              'fetchpriority' => 'high',
-            ]); ?>
-          <?php else : ?>
-            <div class="sp-img-empty" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
-          <?php endif; ?>
+        <?php if ( $image_id ) : ?>
+          <?php echo wp_get_attachment_image( $image_id, 'large', false, [
+            'id'           => 'spMainImg',
+            'class'        => 'sp-main-img',
+            'loading'      => 'eager',
+            'fetchpriority'=> 'high',
+          ]); ?>
+        <?php else : ?>
+          <div class="sp-no-img" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="4" y="4" width="40" height="40" rx="4"/>
+              <circle cx="17" cy="18" r="4"/>
+              <path d="M4 34l11-11 8 8 7-7 14 14"/>
+            </svg>
+          </div>
+        <?php endif; ?>
+      </div><!-- /sp-main-frame -->
+
+      <!-- Miniatures -->
+      <?php if ( count($all_images) > 1 ) : ?>
+      <div class="sp-thumbs" role="tablist" aria-label="Vues">
+        <?php foreach ( $all_images as $i => $img_id ) : ?>
+          <button
+            class="sp-thumb <?php echo $i === 0 ? 'is-active' : ''; ?>"
+            role="tab"
+            aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"
+            data-src="<?php echo esc_url( wp_get_attachment_image_url( $img_id, 'large' ) ); ?>"
+            aria-label="Image <?php echo esc_attr($i + 1); ?>">
+            <?php echo wp_get_attachment_image( $img_id, [72, 72], false, ['loading' => 'lazy'] ); ?>
+          </button>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+
+    </div><!-- /sp-gallery -->
+
+    <!-- PANNEAU ACHAT -->
+    <div class="sp-buy">
+
+      <!-- Fil d'Ariane -->
+      <nav aria-label="Fil d’Ariane" class="sp-crumb">
+        <a href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
+        <span aria-hidden="true">/</span>
+        <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Boutique</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page"><?php the_title(); ?></span>
+      </nav>
+
+      <!-- Titre -->
+      <h1 class="sp-title"><?php the_title(); ?></h1>
+
+      <!-- Avis -->
+      <?php if ( wc_reviews_enabled() && $rating_cnt > 0 ) : ?>
+      <div class="sp-stars-row" aria-label="Note : <?php echo esc_attr(round($avg,1)); ?>/5 (« <?php echo esc_attr($rating_cnt); ?> avis)">
+        <span class="sp-stars" aria-hidden="true"><?php
+          for ( $s = 1; $s <= 5; $s++ ) :
+            if ( $s <= floor($avg) ) echo '<svg class="star star-on" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
+            elseif ( $s <= $avg + 0.5 ) echo '<svg class="star star-half" viewBox="0 0 16 16"><path d="M8 1v9.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77z" fill="none" stroke="currentColor" stroke-width=".8"/></svg>';
+            else echo '<svg class="star star-off" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+          endfor;
+        ?></span>
+        <span class="sp-review-count"><?php echo esc_html($rating_cnt); ?> avis</span>
+      </div>
+      <?php endif; ?>
+
+      <!-- Prix -->
+      <div class="sp-price"><?php echo $product->get_price_html(); ?></div>
+
+      <!-- Description courte -->
+      <?php if ( $short_desc ) : ?>
+        <div class="sp-short"><?php echo wp_kses_post($short_desc); ?></div>
+      <?php endif; ?>
+
+      <!-- Formulaire WooCommerce (variations + quantité + bouton) -->
+      <div class="sp-form" id="spForm">
+        <?php woocommerce_template_single_add_to_cart(); ?>
+      </div>
+
+      <!-- Garanties -->
+      <ul class="sp-guarantees">
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="12" height="10" rx="2"/>
+            <path d="M14 8h2.5a1 1 0 011 1v4a2 2 0 01-4 0V9a1 1 0 01.5-.87z"/>
+          </svg>
+          <span>Livraison offerte dès <strong>35 €</strong></span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 4l-1.5 12H4.5L3 4"/><path d="M1 4h18M8 4V2h4v2"/>
+          </svg>
+          <span>Retours gratuits <strong>30 jours</strong></span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M10 18s7-4 7-9V4l-7-2-7 2v5c0 5 7 9 7 9z"/>
+          </svg>
+          <span>Garantie <strong>2 ans</strong></span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="5" width="18" height="12" rx="2"/>
+            <line x1="1" y1="9" x2="19" y2="9"/>
+          </svg>
+          <span>CB &middot; PayPal &middot; Apple Pay</span>
+        </li>
+      </ul>
+
+    </div><!-- /sp-buy -->
+  </div><!-- /sp-wrap -->
+</section>
+
+<!-- ────────────────────────────────────────────────
+     CARACTÉRISTIQUES
+──────────────────────────────────────────────── -->
+<?php if ( ! empty($attributes) ) : ?>
+<section class="sp-specs">
+  <div class="sp-container">
+    <div class="sp-section-head">
+      <span class="sp-tag">Fiche technique</span>
+      <h2 class="sp-section-title">Caractéristiques</h2>
+    </div>
+    <dl class="sp-specs-grid">
+      <?php foreach ( $attributes as $attribute ) :
+        $label = wc_attribute_label( $attribute->get_name(), $product );
+        if ( $attribute->is_taxonomy() ) {
+          $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), ['fields'=>'names'] );
+          $val   = (!is_wp_error($terms) && !empty($terms)) ? implode(', ', $terms) : '';
+        } else {
+          $opts = $attribute->get_options();
+          $val  = !empty($opts) ? implode(', ', $opts) : '';
+        }
+        if (!$val) continue;
+      ?>
+        <div class="sp-spec">
+          <dt><?php echo esc_html($label); ?></dt>
+          <dd><?php echo esc_html($val); ?></dd>
+        </div>
+      <?php endforeach; ?>
+    </dl>
+  </div>
+</section>
+<?php endif; ?>
+
+<!-- ────────────────────────────────────────────────
+     DESCRIPTION + FAQ
+──────────────────────────────────────────────── -->
+<section class="sp-details">
+  <div class="sp-container sp-details-inner">
+
+    <?php if ( $long_desc ) : ?>
+    <div class="sp-desc">
+      <span class="sp-tag">Description</span>
+      <h2 class="sp-section-title sp-section-title--sm">Détails</h2>
+      <div class="sp-desc-body"><?php echo wp_kses_post($long_desc); ?></div>
+    </div>
+    <?php endif; ?>
+
+    <div class="sp-faq <?php echo $long_desc ? '' : 'sp-faq--full'; ?>">
+      <?php if ( !$long_desc ) : ?><span class="sp-tag">Infos pratiques</span><?php endif; ?>
+
+      <div class="sp-acc-list">
+
+        <div class="sp-acc">
+          <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-compat">
+            Compatibilité
+            <svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </button>
+          <div id="acc-compat" class="sp-acc-panel" hidden>
+            Compatible avec tous les appareils USB-C&nbsp;: iPhone 15+, Samsung Galaxy, Google Pixel, MacBook Air/Pro, iPad Pro et tout appareil USB-C.
+          </div>
         </div>
 
-        <?php if (!empty($gallery)) : ?>
-          <div class="sp-thumbs" id="spThumbs" role="tablist" aria-label="Vues du produit">
-            <?php if ($image_id) : ?>
-              <button class="sp-thumb is-active"
-                role="tab" aria-selected="true"
-                data-full="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'chg-product-featured')); ?>"
-                aria-label="Vue principale">
-                <?php echo wp_get_attachment_image($image_id, [80,80], false, ['loading'=>'lazy']); ?>
-              </button>
+        <div class="sp-acc">
+          <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-livraison">
+            Livraison &amp; Retours
+            <svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </button>
+          <div id="acc-livraison" class="sp-acc-panel" hidden>
+            Expédition 24&nbsp;h ouvrable. Livraison offerte dès 35&nbsp;€, reçue en 3–4 jours. Retours acceptés sous 30 jours dans l’emballage d’origine.
+          </div>
+        </div>
+
+        <div class="sp-acc">
+          <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-garantie">
+            Garantie
+            <svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </button>
+          <div id="acc-garantie" class="sp-acc-panel" hidden>
+            Garantie constructeur 2 ans. Retour ou échange sans condition dans les 30 premiers jours.
+          </div>
+        </div>
+
+      </div><!-- /sp-acc-list -->
+    </div><!-- /sp-faq -->
+
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────
+     PRODUITS ASSOCIÉS
+──────────────────────────────────────────────── -->
+<?php
+$related = wc_get_related_products( $product->get_id(), 3 );
+if ( !empty($related) ) :
+?>
+<section class="sp-related">
+  <div class="sp-container">
+    <div class="sp-section-head">
+      <span class="sp-tag">Vous aimerez aussi</span>
+      <h2 class="sp-section-title">Dans la gamme</h2>
+    </div>
+    <div class="products-grid">
+      <?php foreach ( $related as $rid ) :
+        $rp = wc_get_product($rid);
+        if ( !$rp || !$rp->is_visible() ) continue;
+        $rb = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
+        $rtid = $rp->get_image_id();
+      ?>
+        <article class="product-card" data-product-id="<?php echo esc_attr($rid); ?>">
+          <a class="card-img-wrap" href="<?php echo esc_url(get_permalink($rid)); ?>" tabindex="-1" aria-hidden="true">
+            <?php if ($rb) : ?>
+              <div class="card-badge badge-<?php echo esc_attr($rb['id']); ?>"><?php echo $rb['label']; ?></div>
             <?php endif; ?>
-            <?php foreach ($gallery as $i => $gid) : ?>
-              <button class="sp-thumb"
-                role="tab" aria-selected="false"
-                data-full="<?php echo esc_url(wp_get_attachment_image_url($gid, 'chg-product-featured')); ?>"
-                aria-label="Vue <?php echo esc_attr($i+2); ?>">
-                <?php echo wp_get_attachment_image($gid, [80,80], false, ['loading'=>'lazy']); ?>
-              </button>
-            <?php endforeach; ?>
+            <?php if ($rtid) : echo wp_get_attachment_image($rtid,'chg-product-card',false,['class'=>'slide-product-img','loading'=>'lazy']);
+            else : ?><div class="card-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <?php endif; ?>
+          </a>
+          <div class="card-info">
+            <h3 class="card-name"><a href="<?php echo esc_url(get_permalink($rid)); ?>"><?php echo esc_html($rp->get_name()); ?></a></h3>
+            <div class="card-bottom">
+              <div class="card-price"><?php echo $rp->get_price_html(); ?></div>
+              <a href="<?php echo esc_url(get_permalink($rid)); ?>" class="card-add">Voir</a>
+            </div>
           </div>
-        <?php endif; ?>
-
-      </div><!-- /sp-col-gallery -->
-
-      <!-- Panneau achat (col droite) -->
-      <div class="sp-col-buy">
-
-        <!-- Breadcrumb -->
-        <nav class="sp-breadcrumb" aria-label="Fil d'Ariane">
-          <ol>
-            <li><a href="<?php echo esc_url(home_url('/')); ?>">Accueil</a></li>
-            <li aria-hidden="true">&rsaquo;</li>
-            <li><a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Boutique</a></li>
-            <li aria-hidden="true">&rsaquo;</li>
-            <li aria-current="page"><?php the_title(); ?></li>
-          </ol>
-        </nav>
-
-        <!-- Eyebrow -->
-        <p class="sp-eyebrow">Chargeurie &mdash; Chargeur Premium</p>
-
-        <!-- Titre -->
-        <h1 class="sp-title"><?php the_title(); ?></h1>
-
-        <!-- Avis (si activés) -->
-        <?php if ( wc_reviews_enabled() && $rating_cnt > 0 ) : ?>
-          <div class="sp-rating" role="img" aria-label="Note : <?php echo esc_attr(round($avg_rating, 1)); ?> sur 5 (<?php echo esc_attr($rating_cnt); ?> avis)">
-            <span class="sp-stars" aria-hidden="true"><?php
-              $full = floor($avg_rating);
-              $half = ($avg_rating - $full >= 0.5) ? 1 : 0;
-              $empty = 5 - $full - $half;
-              echo str_repeat('<svg class="star star-full" viewBox="0 0 12 12"><path d="M6 1l1.39 2.82L10.5 4.27l-2.25 2.19.53 3.1L6 8l-2.78 1.56.53-3.1L1.5 4.27l3.11-.45z" fill="currentColor"/></svg>', $full);
-              if ($half) echo '<svg class="star star-half" viewBox="0 0 12 12"><path d="M6 1v7L3.22 9.56l.53-3.1L1.5 4.27l3.11-.45z" fill="currentColor"/><path d="M6 1l1.39 2.82L10.5 4.27l-2.25 2.19.53 3.1L6 8z" fill="none" stroke="currentColor" stroke-width=".5"/></svg>';
-              echo str_repeat('<svg class="star star-empty" viewBox="0 0 12 12"><path d="M6 1l1.39 2.82L10.5 4.27l-2.25 2.19.53 3.1L6 8l-2.78 1.56.53-3.1L1.5 4.27l3.11-.45z" fill="none" stroke="currentColor" stroke-width=".8"/></svg>', $empty);
-            ?></span>
-            <span class="sp-rating-count"><?php echo esc_html($rating_cnt); ?> avis</span>
-          </div>
-        <?php endif; ?>
-
-        <!-- Prix -->
-        <div class="sp-price" aria-label="Prix"><?php echo $product->get_price_html(); ?></div>
-
-        <!-- Courte description -->
-        <?php if ($short) : ?>
-          <div class="sp-short"><?php echo wp_kses_post($short); ?></div>
-        <?php endif; ?>
-
-        <!-- Formulaire WooCommerce (variations + quantité + ATC) -->
-        <div class="sp-form" id="spForm">
-          <?php woocommerce_template_single_add_to_cart(); ?>
-        </div>
-
-        <!-- Trust strip -->
-        <ul class="sp-trust" aria-label="Garanties">
-          <li class="sp-trust-item">
-            <span class="sp-trust-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a1 1 0 011 1v7a1.5 1.5 0 01-3 0 1.5 1.5 0 01-3 0V9a1 1 0 011-1z"/></svg>
-            </span>
-            <span>Livraison offerte dès <strong>35 €</strong> &middot; <strong>3–4 j</strong> ouvrés</span>
-          </li>
-          <li class="sp-trust-item">
-            <span class="sp-trust-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-            </span>
-            <span>Retours sans frais sous <strong>30 jours</strong></span>
-          </li>
-          <li class="sp-trust-item">
-            <span class="sp-trust-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </span>
-            <span>Garantie <strong>2 ans</strong> constructeur</span>
-          </li>
-          <li class="sp-trust-item sp-trust-payment">
-            <span class="sp-trust-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            </span>
-            <span>Paiement sécurisé &middot; <strong>CB, PayPal, Apple Pay</strong></span>
-          </li>
-        </ul>
-
-      </div><!-- /sp-col-buy -->
-    </div><!-- /sp-hero-inner -->
-  </section><!-- /sp-hero -->
-
-  <!-- ── CARACTÉRISTIQUES (fond blanc, tableau propre) ─────────────── -->
-  <?php if ( ! empty( $attrs ) ) : ?>
-  <section class="sp-specs-section" aria-label="Caractéristiques">
-    <div class="chg-container-xl">
-      <header class="sp-section-header">
-        <p class="sp-tag">Fiche technique</p>
-        <h2 class="sp-section-title">Caractéristiques</h2>
-      </header>
-      <dl class="sp-specs-table">
-        <?php foreach ( $attrs as $attribute ) :
-          $attr_name = wc_attribute_label( $attribute->get_name(), $product );
-          if ( $attribute->is_taxonomy() ) {
-            $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), [ 'fields' => 'names' ] );
-            $attr_value = ( ! is_wp_error( $terms ) && ! empty( $terms ) ) ? implode( ', ', $terms ) : '';
-          } else {
-            $options    = $attribute->get_options();
-            $attr_value = ! empty( $options ) ? implode( ', ', $options ) : '';
-          }
-          if ( ! $attr_value ) continue;
-        ?>
-          <div class="sp-spec-row">
-            <dt><?php echo esc_html( $attr_name ); ?></dt>
-            <dd><?php echo esc_html( $attr_value ); ?></dd>
-          </div>
-        <?php endforeach; ?>
-      </dl>
+        </article>
+      <?php endforeach; ?>
     </div>
-  </section>
-  <?php endif; ?>
+  </div>
+</section>
+<?php endif; ?>
 
-  <!-- ── DESCRIPTION + ACCORDIONS (fond off) ──────────────────── -->
-  <section class="sp-info-section">
-    <div class="sp-info-inner chg-container-xl">
+</div><!-- /sp-page -->
 
-      <?php if ($desc) : ?>
-      <div class="sp-desc-col">
-        <p class="sp-tag">Description</p>
-        <h2 class="sp-section-title sp-section-title--sm">Détails du produit</h2>
-        <div class="sp-desc-body"><?php echo wp_kses_post($desc); ?></div>
-      </div>
-      <?php endif; ?>
-
-      <div class="sp-faq-col">
-        <?php if (!$desc) : ?><p class="sp-tag">Informations</p><?php endif; ?>
-
-        <div class="sp-accordions" role="list">
-
-          <div class="sp-accordion" role="listitem">
-            <button class="sp-accordion-btn" aria-expanded="false" aria-controls="sp-acc-compat">
-              <span>Compatibilité</span>
-              <span class="sp-acc-icon" aria-hidden="true"></span>
-            </button>
-            <div class="sp-accordion-panel" id="sp-acc-compat" hidden>
-              <p>Compatible avec tous les appareils USB-C : iPhone 15+, Samsung Galaxy, Google Pixel, MacBook Air/Pro, iPad Pro et tout appareil à port USB-C.</p>
-            </div>
-          </div>
-
-          <div class="sp-accordion" role="listitem">
-            <button class="sp-accordion-btn" aria-expanded="false" aria-controls="sp-acc-livraison">
-              <span>Livraison &amp; Retours</span>
-              <span class="sp-acc-icon" aria-hidden="true"></span>
-            </button>
-            <div class="sp-accordion-panel" id="sp-acc-livraison" hidden>
-              <p>Expédition sous 24 h les jours ouvrables. Livraison offerte dès 35 €, reçue en 3 à 4 jours ouvrés. Retours acceptés sous 30 jours — produit non utilisé dans son emballage d’origine.</p>
-            </div>
-          </div>
-
-          <div class="sp-accordion" role="listitem">
-            <button class="sp-accordion-btn" aria-expanded="false" aria-controls="sp-acc-garantie">
-              <span>Garantie</span>
-              <span class="sp-acc-icon" aria-hidden="true"></span>
-            </button>
-            <div class="sp-accordion-panel" id="sp-acc-garantie" hidden>
-              <p>Garantie constructeur 2 ans. En cas de défaut, échange ou remboursement intégral sans condition dans les 30 premiers jours.</p>
-            </div>
-          </div>
-
-        </div><!-- /sp-accordions -->
-      </div><!-- /sp-faq-col -->
-
-    </div><!-- /sp-info-inner -->
-  </section>
-
-  <!-- ── PRODUITS ASSOCIÉS ─────────────────────────────────── -->
-  <?php
-  $related = wc_get_related_products($product->get_id(), 3);
-  if (!empty($related)) :
-  ?>
-  <section class="sp-related-section">
-    <div class="chg-container-xl">
-      <header class="sp-section-header">
-        <p class="products-tag">Vous aimerez aussi</p>
-        <h2 class="sp-section-title">Dans la même gamme</h2>
-      </header>
-      <div class="products-grid">
-        <?php foreach ($related as $rid) :
-          $rp = wc_get_product($rid);
-          if (!$rp || !$rp->is_visible()) continue;
-          $rb = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
-        ?>
-          <article class="product-card" data-product-id="<?php echo esc_attr($rid); ?>">
-            <a href="<?php echo esc_url(get_permalink($rid)); ?>" class="card-img-wrap" tabindex="-1" aria-hidden="true">
-              <?php if ($rb) : ?><div class="card-badge badge-<?php echo esc_attr($rb['id']); ?>"><?php echo $rb['label']; ?></div><?php endif; ?>
-              <?php $rtid = $rp->get_image_id(); ?>
-              <?php if ($rtid) :
-                echo wp_get_attachment_image($rtid, 'chg-product-card', false, ['class'=>'slide-product-img','loading'=>'lazy']);
-              else : ?>
-                <div class="card-placeholder" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </div>
-              <?php endif; ?>
-            </a>
-            <div class="card-info">
-              <h3 class="card-name"><a href="<?php echo esc_url(get_permalink($rid)); ?>"><?php echo esc_html($rp->get_name()); ?></a></h3>
-              <div class="card-bottom">
-                <div class="card-price"><?php echo $rp->get_price_html(); ?></div>
-                <a href="<?php echo esc_url(get_permalink($rid)); ?>" class="card-add">Voir</a>
-              </div>
-            </div>
-          </article>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </section>
-  <?php endif; ?>
-
-</main><!-- /chg-sp -->
-
-<!-- ── STICKY ATC BAR (mobile + desktop scroll) ─────────────── -->
-<div class="sp-sticky-bar" id="spStickyBar" aria-hidden="true">
-  <div class="sp-sticky-inner">
-    <div class="sp-sticky-info">
-      <?php if ($image_id) : ?>
-        <?php echo wp_get_attachment_image($image_id, [48,48], false, ['class'=>'sp-sticky-thumb','loading'=>'lazy']); ?>
-      <?php endif; ?>
-      <span class="sp-sticky-name"><?php the_title(); ?></span>
-    </div>
-    <div class="sp-sticky-price"><?php echo $product->get_price_html(); ?></div>
-    <button class="sp-sticky-btn" id="spStickyBtn" type="button">
-      Ajouter au panier
-    </button>
+<!-- STICKY ATC — apparaît quand le formulaire quitte le viewport -->
+<div class="sp-sticky" id="spSticky" aria-hidden="true">
+  <div class="sp-sticky-in">
+    <?php if ( $image_id ) :
+      echo wp_get_attachment_image($image_id, [44,44], false, ['class'=>'sp-sticky-img','loading'=>'lazy']);
+    endif; ?>
+    <span class="sp-sticky-name"><?php the_title(); ?></span>
+    <span class="sp-sticky-price"><?php echo $product->get_price_html(); ?></span>
+    <button class="sp-sticky-btn" id="spStickyBtn" type="button">Ajouter au panier</button>
   </div>
 </div>
 
 <script>
-/* === Fiche produit — JS autonome === */
 (function(){
-  'use strict';
+  /* 1. Nav : expose .sp-hero comme .hero pour le JS du thème */
+  var h = document.querySelector('.sp-hero');
+  if(h) h.classList.add('hero');
 
-  /* ── 1. Galerie : swap image principale ──────────────────── */
+  /* 2. Galerie : swap image principale */
   var mainImg = document.getElementById('spMainImg');
-  var thumbs  = document.querySelectorAll('.sp-thumb');
-
-  function swapImg(src){
-    if (!mainImg) return;
-    mainImg.style.opacity = '0';
-    mainImg.src = src;
-    mainImg.onload = function(){ mainImg.style.opacity = '1'; };
-  }
-
-  thumbs.forEach(function(btn){
+  document.querySelectorAll('.sp-thumb').forEach(function(btn){
     btn.addEventListener('click', function(){
-      thumbs.forEach(function(b){
-        b.classList.remove('is-active');
-        b.setAttribute('aria-selected','false');
+      document.querySelectorAll('.sp-thumb').forEach(function(b){
+        b.classList.remove('is-active'); b.setAttribute('aria-selected','false');
       });
-      btn.classList.add('is-active');
-      btn.setAttribute('aria-selected','true');
-      swapImg(btn.dataset.full);
+      btn.classList.add('is-active'); btn.setAttribute('aria-selected','true');
+      if(!mainImg) return;
+      mainImg.style.opacity='0';
+      mainImg.src = btn.dataset.src;
+      mainImg.onload = function(){ mainImg.style.opacity='1'; };
     });
   });
 
-  /* ── 2. Variation WooCommerce ────────────────────────── */
+  /* 3. Sync variation WooCommerce → galerie */
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.querySelector('form.variations_form');
-    if (!form || typeof jQuery === 'undefined') return;
-
+    if(!form || typeof jQuery==='undefined') return;
     jQuery(form)
-      .on('found_variation', function(e, v){
-        if (v.image && v.image.full_src){
-          swapImg(v.image.full_src);
-          thumbs.forEach(function(b){
-            b.classList.remove('is-active');
-            b.setAttribute('aria-selected','false');
-          });
-          var match = Array.from(thumbs).find(function(b){
-            return b.dataset.full === v.image.full_src;
-          });
-          if (match){
-            match.classList.add('is-active');
-            match.setAttribute('aria-selected','true');
-          }
+      .on('found_variation', function(e,v){
+        if(v.image && v.image.full_src && mainImg){
+          mainImg.style.opacity='0';
+          mainImg.src = v.image.full_src;
+          mainImg.onload=function(){mainImg.style.opacity='1';};
         }
       })
-      .on('reset_data', function(){
-        var first = thumbs[0];
-        if (first){
-          thumbs.forEach(function(b){
-            b.classList.remove('is-active');
-            b.setAttribute('aria-selected','false');
+      .on('reset_data',function(){
+        var first = document.querySelector('.sp-thumb');
+        if(first && mainImg){
+          mainImg.style.opacity='0';
+          mainImg.src=first.dataset.src;
+          mainImg.onload=function(){mainImg.style.opacity='1';};
+          document.querySelectorAll('.sp-thumb').forEach(function(b){
+            b.classList.remove('is-active'); b.setAttribute('aria-selected','false');
           });
-          first.classList.add('is-active');
-          first.setAttribute('aria-selected','true');
-          swapImg(first.dataset.full);
+          first.classList.add('is-active'); first.setAttribute('aria-selected','true');
         }
       });
   });
 
-  /* ── 3. Accordions accessibles ──────────────────────── */
-  document.querySelectorAll('.sp-accordion-btn').forEach(function(btn){
+  /* 4. Accordions */
+  document.querySelectorAll('.sp-acc-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      var expanded = btn.getAttribute('aria-expanded') === 'true';
-      var panelId  = btn.getAttribute('aria-controls');
-      var panel    = document.getElementById(panelId);
-      if (!panel) return;
-
-      if (expanded){
+      var open  = btn.getAttribute('aria-expanded')==='true';
+      var panel = document.getElementById(btn.getAttribute('aria-controls'));
+      if(!panel) return;
+      /* Fermer tous les autres */
+      document.querySelectorAll('.sp-acc-btn[aria-expanded="true"]').forEach(function(ob){
+        if(ob===btn) return;
+        var op = document.getElementById(ob.getAttribute('aria-controls'));
+        ob.setAttribute('aria-expanded','false');
+        if(op){
+          op.style.height=op.scrollHeight+'px';
+          requestAnimationFrame(function(){
+            op.style.transition='height .3s ease, opacity .25s';
+            op.style.height='0'; op.style.opacity='0';
+          });
+          op.addEventListener('transitionend',function fn(){
+            op.hidden=true; op.style.cssText=''; op.removeEventListener('transitionend',fn);
+          });
+        }
+      });
+      if(open){
         btn.setAttribute('aria-expanded','false');
-        /* Animer la fermeture */
-        panel.style.height = panel.scrollHeight + 'px';
-        panel.style.overflow = 'hidden';
+        panel.style.height=panel.scrollHeight+'px';
         requestAnimationFrame(function(){
-          panel.style.transition = 'height .35s cubic-bezier(.4,0,.2,1), opacity .3s';
-          panel.style.height  = '0';
-          panel.style.opacity = '0';
+          panel.style.transition='height .3s ease, opacity .25s';
+          panel.style.height='0'; panel.style.opacity='0';
         });
-        panel.addEventListener('transitionend', function h(){
-          panel.hidden = true;
-          panel.style = '';
-          panel.removeEventListener('transitionend', h);
+        panel.addEventListener('transitionend',function fn(){
+          panel.hidden=true; panel.style.cssText=''; panel.removeEventListener('transitionend',fn);
         });
       } else {
-        /* Ouvrir les autres d’abord (comportement un seul ouvert à la fois) */
-        document.querySelectorAll('.sp-accordion-btn[aria-expanded="true"]').forEach(function(ob){
-          if (ob !== btn) ob.click();
-        });
         btn.setAttribute('aria-expanded','true');
-        panel.hidden = false;
-        var h = panel.scrollHeight;
-        panel.style.height  = '0';
-        panel.style.opacity = '0';
-        panel.style.overflow = 'hidden';
+        panel.hidden=false;
+        var h2=panel.scrollHeight;
+        panel.style.height='0'; panel.style.opacity='0'; panel.style.overflow='hidden';
         requestAnimationFrame(function(){
-          panel.style.transition = 'height .35s cubic-bezier(.4,0,.2,1), opacity .3s';
-          panel.style.height  = h + 'px';
-          panel.style.opacity = '1';
+          panel.style.transition='height .3s ease, opacity .25s';
+          panel.style.height=h2+'px'; panel.style.opacity='1';
         });
-        panel.addEventListener('transitionend', function h2(){
-          panel.style.height   = '';
-          panel.style.overflow = '';
-          panel.removeEventListener('transitionend', h2);
+        panel.addEventListener('transitionend',function fn(){
+          panel.style.height=''; panel.style.overflow=''; panel.removeEventListener('transitionend',fn);
         });
       }
     });
   });
 
-  /* ── 4. Sticky ATC bar ─────────────────────────────── */
-  var stickyBar = document.getElementById('spStickyBar');
-  var spForm    = document.getElementById('spForm');
-  var stickyBtn = document.getElementById('spStickyBtn');
-
-  if (stickyBar && spForm){
-    var observer = new IntersectionObserver(function(entries){
-      var outOfView = !entries[0].isIntersecting;
-      stickyBar.classList.toggle('is-visible', outOfView);
-      stickyBar.setAttribute('aria-hidden', String(!outOfView));
-    }, { threshold: 0.1 });
-    observer.observe(spForm);
-
-    if (stickyBtn){
-      stickyBtn.addEventListener('click', function(){
-        var realBtn = spForm.querySelector('.single_add_to_cart_button, button[type="submit"]');
-        if (realBtn && !realBtn.disabled) realBtn.click();
-        else spForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  /* 5. Sticky ATC bar */
+  var sticky  = document.getElementById('spSticky');
+  var spForm  = document.getElementById('spForm');
+  var sBtn    = document.getElementById('spStickyBtn');
+  if(sticky && spForm){
+    var io = new IntersectionObserver(function(e){
+      var visible = !e[0].isIntersecting;
+      sticky.classList.toggle('is-visible', visible);
+      sticky.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    },{threshold:0.1});
+    io.observe(spForm);
+    if(sBtn){
+      sBtn.addEventListener('click',function(){
+        var real = spForm.querySelector('.single_add_to_cart_button, button[type="submit"]');
+        if(real && !real.disabled) real.click();
+        else spForm.scrollIntoView({behavior:'smooth',block:'center'});
       });
     }
   }
-
-  /* ── 5. Nav color fix : la sp-hero n’a pas la classe .hero ───── */
-  /* Le JS du thème cherche .hero — on expose la section au ScrollTrigger */
-  var spHero = document.querySelector('.sp-hero');
-  if (spHero) spHero.classList.add('hero');
-
 })();
 </script>
 
