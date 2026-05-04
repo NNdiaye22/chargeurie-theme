@@ -1,18 +1,7 @@
 /*
- * Chargeurie — product.css v8
- * Variables thème : --ink --off --mid --stone --blue --blue2 --white --radius-*
+ * Chargeurie — product.css v9
+ * Toutes les couleurs textes exlicites + !important là où WooCommerce peut écraser
  */
-
-/* ────────────────────────
-   MISE EN PAGE
-──────────────────────── */
-.sp-page { background: var(--white); }
-
-.sp-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 6vw;
-}
 
 /* ────────────────────────
    HERO (fond sombre --ink)
@@ -47,7 +36,7 @@
 .sp-main-frame {
   position: relative;
   background: #fff;
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   overflow: hidden;
   aspect-ratio: 1 / 1;
 }
@@ -62,103 +51,67 @@
 .sp-no-img {
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 100%;
-  color: var(--mid);
+  color: #ccc;
 }
-.sp-no-img svg { width: 64px; height: 64px; }
 
-/* ── BADGES (sur l’image — fond sombre de la frame) ──
-   Fond blanc de la frame : les badges ont besoin d’un fond coloré
-   pour être lisibles sur fond BLANC (pas sombre).
-*/
+/* BADGES (sur fond blanc de la frame) */
 .sp-badge {
   position: absolute;
-  top: 14px; left: 14px;
-  z-index: 2;
-  font-size: 10px;
+  top: 14px; left: 14px; z-index: 2;
+  font-size: 10px !important;
   letter-spacing: .28em;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 700 !important;
   padding: 5px 12px;
   border-radius: 999px;
   line-height: 1;
 }
-/* Promo — bleu */
-.sp-badge.badge-promo {
-  background: var(--blue);
-  color: #fff;
-}
-/* Stock limité — orange ambré, lisible */
-.sp-badge.badge-low {
-  background: #f5a623;
-  color: #1d1d1f;
-}
-/* Bientôt dispo — gris anthracite */
-.sp-badge.badge-backorder {
-  background: rgba(29,29,31,.75);
-  color: rgba(255,255,255,.85);
-  backdrop-filter: blur(4px);
-}
-/* Épuisé — rouge doux */
-.sp-badge.badge-out {
-  background: #c0392b;
-  color: #fff;
-}
+.sp-badge.badge-promo     { background: #0071e3 !important; color: #fff !important; }
+.sp-badge.badge-low       { background: #f5a623 !important; color: #1d1d1f !important; }
+.sp-badge.badge-backorder { background: rgba(29,29,31,.75) !important; color: rgba(255,255,255,.9) !important; }
+.sp-badge.badge-out       { background: #c0392b !important; color: #fff !important; }
 
-/* ── Miniatures ── */
+/* Miniatures */
 .sp-thumbs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
   scrollbar-width: none;
 }
 .sp-thumbs::-webkit-scrollbar { display: none; }
-
 .sp-thumb {
-  flex-shrink: 0;
-  width: 68px; height: 68px;
-  padding: 0;
-  background: #fff;
-  border: 2px solid transparent;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color .2s;
-  outline: none;
+  flex-shrink: 0; width: 68px; height: 68px; padding: 0;
+  background: #fff; border: 2px solid transparent;
+  border-radius: 8px; overflow: hidden; cursor: pointer;
+  transition: border-color .2s; outline: none;
 }
 .sp-thumb img { width:100%; height:100%; object-fit:contain; display:block; }
-.sp-thumb:hover         { border-color: rgba(255,255,255,.35); }
-.sp-thumb.is-active     { border-color: var(--blue); }
-.sp-thumb:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.sp-thumb:hover     { border-color: rgba(255,255,255,.35); }
+.sp-thumb.is-active { border-color: var(--blue, #0071e3); }
 
 /* ────────────────────────
-   PANNEAU ACHAT (fond --ink)
+   PANNEAU ACHAT — tout sur fond --ink
+   TOUTES les couleurs sont explicites ici.
 ──────────────────────── */
-.sp-buy {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-top: 4px;
-}
+.sp-buy * { box-sizing: border-box; }
 
-/* Fil d’Ariane */
+/* Fil d'Ariane */
+.sp-crumb,
+.sp-crumb a,
+.sp-crumb span { color: rgba(255,255,255,.4) !important; }
+.sp-crumb a:hover { color: rgba(255,255,255,.75) !important; }
+.sp-crumb span[aria-current] { color: rgba(255,255,255,.65) !important; }
 .sp-crumb {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-bottom: 24px;
-  font-size: 11px; letter-spacing: .3em; text-transform: uppercase;
-  color: rgba(255,255,255,.35);
+  font-size: 11px !important; letter-spacing: .3em; text-transform: uppercase;
 }
-.sp-crumb a       { color: rgba(255,255,255,.35); transition: color .2s; }
-.sp-crumb a:hover { color: rgba(255,255,255,.7); }
-.sp-crumb span[aria-current] { color: rgba(255,255,255,.6); }
 
 /* Titre */
 .sp-title {
-  font-size: clamp(28px, 3.5vw, 52px);
-  font-weight: 800;
+  font-size: clamp(28px, 3.5vw, 52px) !important;
+  font-weight: 800 !important;
   letter-spacing: -.035em;
   line-height: 1.02;
-  color: #fff;           /* blanc pur sur fond --ink */
+  color: #fff !important;
   margin-bottom: 20px;
 }
 
@@ -166,231 +119,169 @@
 .sp-stars-row { display:flex; align-items:center; gap:8px; margin-bottom:20px; }
 .sp-stars { display:flex; gap:2px; }
 .star { width:15px; height:15px; }
-.star-on   { color: #f5a623; }
-.star-half { color: #f5a623; }
-.star-off  { color: rgba(255,255,255,.25); }
-.sp-review-count { font-size:12px; color:rgba(255,255,255,.45); letter-spacing:.05em; }
+.star-on   { color: #f5a623 !important; }
+.star-half { color: #f5a623 !important; }
+.star-off  { color: rgba(255,255,255,.25) !important; }
+.sp-review-count { font-size:12px !important; color:rgba(255,255,255,.5) !important; }
 
 /* ────────────────────────
-   BLOCS PRIX — deux états distincts
-   #spPriceBase    : visible AVANT la sélection d’une variation
-   #spPriceVariant : visible APRÈS (injecté par WC via found_variation)
+   BLOCS PRIX
+   Fond = --ink (sombre) donc texte BLANC obligatoire
 ──────────────────────── */
 
-/* Wrapper commun */
 #spPriceBase,
 #spPriceVariant {
-  margin-bottom: 24px;
-  line-height: 1;
+  margin-bottom: 20px;
+  color: #fff !important;
 }
 
-/* ── PRIX DE BASE : "A partir de XX,XX €" ──
-   WooCommerce génère :
-     <span class="price">A partir de <span class="woocommerce-Price-amount"><bdi>XX €</bdi></span></span>
-   ou pour un simple :
-     <span class="price"><span class="woocommerce-Price-amount"><bdi>XX €</bdi></span></span>
-*/
-#spPriceBase .price {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px 10px;
-}
-
-/* Le texte "A partir de" ou "A partir de" : petit, discret mais LISIBLE */
-#spPriceBase .price > span:first-child:not(.woocommerce-Price-amount),
-#spPriceBase .price-from-label {
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255,255,255,.55);  /* lisible sur --ink */
-  letter-spacing: .03em;
-  align-self: center;
-}
-
-/* Montant principal dans le prix de base */
-#spPriceBase .price .woocommerce-Price-amount {
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 800;
-  letter-spacing: -.04em;
-  color: #fff;                    /* blanc sur --ink */
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-/* Cas promo sur produit simple dans le prix de base */
-#spPriceBase .price del .woocommerce-Price-amount {
-  font-size: clamp(16px, 2vw, 20px);
-  font-weight: 400;
-  color: rgba(255,255,255,.3);   /* barré visible mais discret */
-}
-#spPriceBase .price del {
-  text-decoration: none;
-  position: relative;
-}
-#spPriceBase .price del::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 52%;
-  height: 1px;
-  background: rgba(255,255,255,.28);
-}
-#spPriceBase .price ins {
-  text-decoration: none;
-}
-#spPriceBase .price ins .woocommerce-Price-amount {
-  color: var(--blue2); /* prix promo en bleu clair */
-}
-
-/* ── PRIX DE VARIATION résolue ──
-   Injecté dynamiquement par notre JS depuis variation.price_html
-   Structure identique à celle de WooCommerce.
-*/
-#spPriceVariant {
-  display: none; /* caché par défaut, affiché par JS */
-}
-
+/* WooCommerce injecte .price qui peut avoir color:inherit ou color:#333 */
+#spPriceBase .price,
 #spPriceVariant .price {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px 14px;
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  gap: 6px 10px !important;
+  color: #fff !important;
 }
 
-/* Prix de la variation : grand, blanc */
-#spPriceVariant .price .woocommerce-Price-amount {
-  font-size: clamp(30px, 4vw, 44px);
-  font-weight: 800;
-  letter-spacing: -.04em;
-  color: #fff;
+/* "A partir de" — texte discret mais blanc lisible */
+#spPriceBase .price > span.woocommerce-Price-currencySymbol,
+#spPriceBase > .price > bdi,
+#spPriceBase .price {
+  color: #fff !important;
+}
+/* Texte littéral "A partir de" (noeud texte + tous span non-montant) */
+#spPriceBase { color: rgba(255,255,255,.6) !important; font-size: 14px !important; }
+
+/* Montant principal */
+#spPriceBase .woocommerce-Price-amount,
+#spPriceVariant .woocommerce-Price-amount {
+  font-size: clamp(28px, 4vw, 44px) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.04em !important;
+  color: #fff !important;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
+  line-height: 1 !important;
 }
-/* Prix barré dans la variation */
-#spPriceVariant .price del .woocommerce-Price-amount {
-  font-size: clamp(16px, 2vw, 20px);
-  font-weight: 400;
-  color: rgba(255,255,255,.3);
-}
-#spPriceVariant .price del {
-  text-decoration: none;
+
+/* Prix barré (produit en promo) */
+#spPriceBase del,
+#spPriceVariant del {
+  text-decoration: none !important;
   position: relative;
 }
-#spPriceVariant .price del::after {
+#spPriceBase del::after,
+#spPriceVariant del::after {
   content: '';
   position: absolute; left:0; right:0; top:52%;
-  height: 1px;
-  background: rgba(255,255,255,.28);
+  height: 1px; background: rgba(255,255,255,.3);
 }
-#spPriceVariant .price ins { text-decoration: none; }
-#spPriceVariant .price ins .woocommerce-Price-amount {
-  color: var(--blue2);
+#spPriceBase del .woocommerce-Price-amount,
+#spPriceVariant del .woocommerce-Price-amount {
+  font-size: clamp(14px, 2vw, 18px) !important;
+  font-weight: 400 !important;
+  color: rgba(255,255,255,.35) !important;
 }
 
-/* Badge économie ── */
-.sp-price-save {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(41,151,255,.15);
-  border: 1px solid rgba(41,151,255,.3);
-  color: var(--blue2);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: 4px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-  align-self: center;
+/* Prix promo (ins) */
+#spPriceBase ins,
+#spPriceVariant ins { text-decoration: none !important; }
+#spPriceBase ins .woocommerce-Price-amount,
+#spPriceVariant ins .woocommerce-Price-amount {
+  color: var(--blue2, #4da6ff) !important;
 }
+
+/* Badge économie */
+.sp-price-save {
+  display: inline-flex; align-items: center;
+  background: rgba(0,113,227,.15);
+  border: 1px solid rgba(0,113,227,.3);
+  color: var(--blue2, #4da6ff) !important;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+}
+
+/* WooCommerce .woocommerce-variation-price (on le masque, on gère #spPriceVariant) */
+.woocommerce-variation-price { display: none !important; }
 
 /* Description courte */
 .sp-short {
-  font-size: 15px;
+  font-size: 15px !important;
   line-height: 1.85;
-  color: rgba(255,255,255,.5);  /* lisible sur --ink */
-  border-left: 2px solid var(--blue);
+  color: rgba(255,255,255,.55) !important;
+  border-left: 2px solid var(--blue, #0071e3);
   padding-left: 16px;
   margin-bottom: 28px;
 }
 .sp-short p { margin: 0; }
-.sp-short strong,
-.sp-short b { color: rgba(255,255,255,.85); }
+.sp-short strong, .sp-short b { color: rgba(255,255,255,.85) !important; }
 
 /* ────────────────────────
    FORMULAIRE WooCommerce
 ──────────────────────── */
 .sp-form { margin-bottom: 28px; }
 
-/* Reset native WooCommerce variation price display
-   (WC affiche son propre .woocommerce-variation-price — on le cache
-    car on gère #spPriceVariant à la place) */
-.sp-form .woocommerce-variation-price { display: none !important; }
-
-.sp-form table.variations {
-  display: flex; flex-direction: column; gap: 16px;
-  margin-bottom: 20px; width: 100%;
-  border: none; border-collapse: initial;
-}
-.sp-form table.variations tr,
-.sp-form table.variations tbody { display: flex; flex-direction: column; gap: 8px; }
+/* Label variation */
+.sp-form table.variations { width:100%; border:none; border-collapse:collapse; margin-bottom:20px; }
+.sp-form table.variations,
+.sp-form table.variations tbody,
+.sp-form table.variations tr { display:flex; flex-direction:column; gap:14px; }
 .sp-form table.variations td,
-.sp-form table.variations th { display: block; padding: 0; border: none; background: none; text-align: left; }
-.sp-form table.variations .label label {
-  font-size: 10px; letter-spacing: .45em; text-transform: uppercase;
-  color: rgba(255,255,255,.45);  /* lisible sur --ink */
-  font-weight: 600; display: block; margin-bottom: 6px;
+.sp-form table.variations th { display:block; padding:0; border:none; background:none; text-align:left; }
+.sp-form .variations .label label {
+  display: block; margin-bottom: 6px;
+  font-size: 10px !important; letter-spacing: .45em; text-transform: uppercase;
+  color: rgba(255,255,255,.5) !important; font-weight: 600 !important;
 }
 
-/* Select variation */
+/* Select */
 .sp-form .variations select {
-  width: 100%;
-  border: 1.5px solid rgba(255,255,255,.18);
-  border-radius: var(--radius-sm);
-  padding: 12px 40px 12px 16px;
-  font-size: 15px; font-family: inherit;
-  color: #fff;                          /* texte blanc lisible */
-  background-color: rgba(255,255,255,.07);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,.45)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  -webkit-appearance: none; appearance: none;
-  cursor: pointer;
-  transition: border-color .2s, box-shadow .2s;
-  outline: none;
+  width:100%;
+  border: 1.5px solid rgba(255,255,255,.18) !important;
+  border-radius: 8px !important;
+  padding: 12px 40px 12px 16px !important;
+  font-size: 15px !important; font-family: inherit;
+  color: #fff !important;
+  background-color: rgba(255,255,255,.07) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,.5)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  -webkit-appearance: none !important; appearance: none !important;
+  cursor: pointer; outline: none;
 }
-.sp-form .variations select option { background: var(--ink); color: #fff; }
+.sp-form .variations select option { background: #1d1d1f; color: #fff; }
 .sp-form .variations select:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(0,113,227,.2);
+  border-color: var(--blue, #0071e3) !important;
+  box-shadow: 0 0 0 3px rgba(0,113,227,.2) !important;
 }
 
 .sp-form .reset_variations {
   font-size: 11px; letter-spacing: .25em; text-transform: uppercase;
-  color: rgba(255,255,255,.28); display: inline-block; margin-top: 6px; transition: color .2s;
+  color: rgba(255,255,255,.3) !important; display: inline-block; margin-top: 6px;
+  transition: color .2s;
 }
-.sp-form .reset_variations:hover { color: rgba(255,255,255,.6); }
+.sp-form .reset_variations:hover { color: rgba(255,255,255,.65) !important; }
 
-/* Description variation */
-.sp-form .woocommerce-variation-description { margin: 6px 0 10px; }
 .sp-form .woocommerce-variation-description p {
-  font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.7; margin: 0;
+  font-size: 13px !important; color: rgba(255,255,255,.45) !important; line-height: 1.7; margin: 0 0 10px;
 }
 
 /* Ligne quantité + bouton */
 .sp-form .woocommerce-variation-add-to-cart,
-.sp-form form.cart { display: flex; align-items: center; gap: 12px; }
+.sp-form form.cart { display:flex; align-items:center; gap:12px; }
 
-/* Stepper */
 .sp-form .quantity {
   display: inline-flex; align-items: center;
-  border: 1.5px solid rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.18) !important;
   border-radius: 999px; overflow: hidden;
   background: rgba(255,255,255,.06); flex-shrink: 0;
 }
 .sp-form .qty {
   width: 52px; text-align: center;
-  border: none; background: transparent;
-  color: #fff;                 /* blanc lisible sur --ink */
-  font-size: 15px; font-weight: 600; font-family: inherit;
+  border: none !important; background: transparent !important;
+  color: #fff !important;
+  font-size: 15px !important; font-weight: 600; font-family: inherit;
   padding: 10px 0; -moz-appearance: textfield; outline: none;
 }
 .sp-form .qty::-webkit-inner-spin-button,
@@ -400,7 +291,7 @@
 .sp-form .single_add_to_cart_button,
 .sp-form button[type="submit"] {
   flex: 1;
-  background: var(--blue) !important;
+  background: var(--blue, #0071e3) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 999px !important;
@@ -418,13 +309,22 @@
   transform: translateY(-1px) !important;
   box-shadow: 0 8px 28px rgba(0,113,227,.48) !important;
 }
-.sp-form .single_add_to_cart_button:active { transform: none !important; }
 .sp-form .single_add_to_cart_button.disabled,
 .sp-form .single_add_to_cart_button:disabled {
   background: rgba(255,255,255,.12) !important;
   color: rgba(255,255,255,.4) !important;
-  box-shadow: none !important; cursor: not-allowed !important; transform: none !important;
+  box-shadow: none !important; cursor:not-allowed !important; transform:none !important;
 }
+
+/* Disponibilité stock (message WooCommerce) */
+.sp-form .woocommerce-variation-availability p,
+.sp-form .stock {
+  font-size: 12px !important;
+  color: rgba(255,255,255,.55) !important;
+  margin: 6px 0 0 !important;
+}
+.sp-form .in-stock  { color: #4cd964 !important; }
+.sp-form .out-of-stock { color: #ff3b30 !important; }
 
 /* Garanties */
 .sp-guarantees {
@@ -434,18 +334,18 @@
 }
 .sp-guarantees li {
   display: flex; align-items: center; gap: 10px;
-  font-size: 13px;
-  color: rgba(255,255,255,.45);   /* lisible sur --ink */
+  font-size: 13px !important;
+  color: rgba(255,255,255,.5) !important;
   line-height: 1.5;
 }
 .sp-guarantees li strong {
-  color: rgba(255,255,255,.8);    /* accent lisible */
+  color: rgba(255,255,255,.85) !important;
   font-weight: 600;
 }
-.sp-guarantees svg { flex-shrink:0; width:16px; height:16px; color:var(--blue); }
+.sp-guarantees svg { flex-shrink:0; width:16px; height:16px; color: var(--blue, #0071e3) !important; }
 
 /* ────────────────────────
-   EN-TÊTE SECTIONS
+   EN-TÊTE SECTIONS (fond clair)
 ──────────────────────── */
 .sp-section-head { display:flex; flex-direction:column; gap:8px; margin-bottom:48px; }
 .sp-tag { font-size:11px; letter-spacing:.5em; text-transform:uppercase; color:var(--stone); display:block; }
@@ -455,16 +355,11 @@
 }
 .sp-section-title--sm { font-size: clamp(22px, 3vw, 36px); }
 
-/* ────────────────────────
-   CARACTÉRISTIQUES
-──────────────────────── */
-.sp-specs {
-  background: var(--white); padding: 96px 0;
-  border-top: 1px solid var(--mid);
-}
+/* CARACTÉRISTIQUES */
+.sp-specs { background: var(--white); padding: 96px 0; border-top: 1px solid var(--mid); }
 .sp-specs-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
-  border: 1px solid var(--mid); border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--mid); border-radius: 8px; overflow: hidden;
 }
 .sp-spec { display: contents; }
 .sp-spec dt, .sp-spec dd {
@@ -479,24 +374,16 @@
 }
 .sp-spec dd { color: var(--ink); font-weight:500; background: var(--white); }
 
-/* ────────────────────────
-   DESCRIPTION + FAQ
-──────────────────────── */
-.sp-details {
-  background: var(--off); padding: 96px 0;
-  border-top: 1px solid var(--mid);
-}
-.sp-details-inner {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 8vw; align-items: start;
-}
+/* DESCRIPTION + FAQ */
+.sp-details { background: var(--off); padding: 96px 0; border-top: 1px solid var(--mid); }
+.sp-details-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; align-items: start; }
 .sp-faq--full { grid-column: 1 / -1; max-width: 680px; }
-
 .sp-desc-body { font-size:15px; line-height:2; color:var(--stone); margin-top:20px; }
 .sp-desc-body p { margin-bottom: 16px; }
 .sp-desc-body p:last-child { margin-bottom: 0; }
 .sp-desc-body strong { color: var(--ink); }
 
+/* Accordeons */
 .sp-acc-list { display:flex; flex-direction:column; margin-top:28px; }
 .sp-acc { border-top: 1px solid var(--mid); }
 .sp-acc:last-child { border-bottom: 1px solid var(--mid); }
@@ -504,33 +391,21 @@
   display:flex; align-items:center; justify-content:space-between;
   width:100%; padding:20px 0; background:none; border:none; cursor:pointer;
   font-family:inherit; font-size:11px; letter-spacing:.4em; text-transform:uppercase;
-  font-weight:700; color:var(--ink); text-align:left; transition:color .2s; gap:12px;
+  font-weight:700; color:var(--ink); text-align:left; gap:12px;
 }
 .sp-acc-btn:hover { color: var(--blue); }
-.sp-acc-btn:focus-visible { outline:2px solid var(--blue); outline-offset:3px; border-radius:2px; }
-.sp-acc-arrow {
-  flex-shrink:0; width:18px; height:18px; color:var(--stone);
-  transition: transform .3s cubic-bezier(.4,0,.2,1), color .2s;
-}
+.sp-acc-arrow { flex-shrink:0; width:18px; height:18px; color:var(--stone); transition:transform .3s, color .2s; }
 .sp-acc-btn[aria-expanded="true"] .sp-acc-arrow { transform:rotate(180deg); color:var(--blue); }
 .sp-acc-panel { font-size:14px; line-height:1.85; color:var(--stone); padding-bottom:20px; overflow:hidden; }
 
-/* ────────────────────────
-   PRODUITS ASSOCIÉS
-──────────────────────── */
-.sp-related {
-  background: var(--white); padding: 96px 0;
-  border-top: 1px solid var(--mid);
-}
+/* PRODUITS ASSOCIÉS */
+.sp-related { background: var(--white); padding: 96px 0; border-top: 1px solid var(--mid); }
 
-/* ────────────────────────
-   STICKY BAR
-──────────────────────── */
+/* STICKY BAR */
 .sp-sticky {
   position:fixed; bottom:0; left:0; right:0; z-index:400;
-  background: rgba(29,29,31,.94);
+  background: rgba(29,29,31,.95);
   backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid rgba(255,255,255,.09);
   padding: 12px 6vw;
   transform: translateY(100%);
@@ -538,40 +413,21 @@
   pointer-events: none;
 }
 .sp-sticky.is-visible { transform:translateY(0); pointer-events:all; }
-
-.sp-sticky-in {
-  max-width:1280px; margin:0 auto;
-  display:flex; align-items:center; gap:14px;
-}
-.sp-sticky-img {
-  width:44px; height:44px; border-radius:var(--radius-sm);
-  object-fit:contain; background:var(--off); flex-shrink:0;
-}
-.sp-sticky-name {
-  font-size:14px; font-weight:600;
-  color:#fff;       /* blanc sur fond sombre */
-  flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.sp-sticky-price {
-  font-size:17px; font-weight:800;
-  color:#fff;
-  letter-spacing:-.03em; flex-shrink:0;
-}
-.sp-sticky-price .woocommerce-Price-amount { font-size:inherit; font-weight:inherit; color:inherit; }
-/* On cache le texte "A partir de" dans la sticky */
-.sp-sticky-price > .price > span:not(.woocommerce-Price-amount) { display:none; }
-
+.sp-sticky-in { max-width:1280px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+.sp-sticky-img { width:44px; height:44px; border-radius:8px; object-fit:contain; background:#fff; flex-shrink:0; }
+.sp-sticky-name { font-size:14px; font-weight:600; color:#fff !important; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-sticky-price { font-size:17px; font-weight:800; color:#fff !important; letter-spacing:-.03em; flex-shrink:0; }
+.sp-sticky-price .woocommerce-Price-amount { font-size:inherit !important; font-weight:inherit !important; color:#fff !important; }
+.sp-sticky-price .price > span:first-child:not(.woocommerce-Price-amount) { display:none; }
 .sp-sticky-btn {
-  flex-shrink:0; background:var(--blue); color:#fff;
+  flex-shrink:0; background: var(--blue, #0071e3); color:#fff !important;
   border:none; border-radius:999px; padding:10px 24px;
   font-size:11px; letter-spacing:.1em; font-weight:700; text-transform:uppercase;
   cursor:pointer; font-family:inherit; transition:background .25s;
 }
 .sp-sticky-btn:hover { background:#005ecb; }
 
-/* ────────────────────────
-   RESPONSIVE
-──────────────────────── */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .sp-wrap { grid-template-columns:1fr; padding-top:32px; gap:36px; }
   .sp-gallery { position:static; }
@@ -583,15 +439,11 @@
 @media (max-width: 600px) {
   .sp-hero { padding-bottom:56px; }
   .sp-wrap { padding-top:24px; gap:28px; }
-  .sp-title { font-size: clamp(22px, 7vw, 32px); }
-
+  .sp-title { font-size: clamp(22px, 7vw, 32px) !important; }
   .sp-form .woocommerce-variation-add-to-cart,
   .sp-form form.cart { flex-direction:column; align-items:stretch; }
   .sp-form .quantity { justify-content:center; }
-
   .sp-specs, .sp-details, .sp-related { padding:64px 0; }
-  .sp-specs-grid { grid-template-columns:1fr; }
-
   .sp-sticky-name  { display:none; }
   .sp-sticky-price { display:none; }
 }

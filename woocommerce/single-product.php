@@ -1,35 +1,36 @@
 <?php
 /**
- * Chargeurie — single-product.php v8
- * Lisibilité + deux blocs prix (base / variation)
+ * Chargeurie — single-product.php v9
+ * Cache-busting OK + JS variation image/prix robuste
  */
 get_header();
 while ( have_posts() ) : the_post();
 global $product;
 
-$image_id   = $product->get_image_id();
-$gallery    = $product->get_gallery_image_ids();
-$short_desc = $product->get_short_description();
-$long_desc  = $product->get_description();
-$attributes = array_filter( $product->get_attributes(), fn($a) => $a->get_visible() );
-$rating_cnt = $product->get_rating_count();
-$avg        = (float) $product->get_average_rating();
-$badge      = function_exists('chg_card_badge') ? chg_card_badge($product) : null;
+$image_id    = $product->get_image_id();
+$gallery     = $product->get_gallery_image_ids();
+$short_desc  = $product->get_short_description();
+$long_desc   = $product->get_description();
+$attributes  = array_filter( $product->get_attributes(), fn($a) => $a->get_visible() );
+$rating_cnt  = $product->get_rating_count();
+$avg         = (float) $product->get_average_rating();
+$badge       = function_exists('chg_card_badge') ? chg_card_badge($product) : null;
 $is_variable = $product->is_type('variable');
 
 $all_images = [];
 if ( $image_id ) $all_images[] = $image_id;
 foreach ( $gallery as $gid ) $all_images[] = $gid;
 
-// Prix de base HTML ("A partir de" pour un variable, ou prix simple)
 $base_price_html = $product->get_price_html();
 
-// Pour la sticky : montant brut sans "A partir de" (on prend le min)
 if ( $is_variable ) {
   $min_price = wc_price( $product->get_variation_price('min', true) );
 } else {
   $min_price = $base_price_html;
 }
+
+// Image principale URL (pour JS)
+$main_img_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
 ?>
 
 <div class="sp-page">
@@ -52,7 +53,7 @@ if ( $is_variable ) {
             'fetchpriority' => 'high',
           ]);
         else : ?>
-          <div class="sp-no-img" aria-hidden="true">
+          <div class="sp-no-img" id="spMainImg" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1">
               <rect x="4" y="4" width="40" height="40" rx="4"/>
               <circle cx="17" cy="18" r="4"/>
@@ -64,14 +65,18 @@ if ( $is_variable ) {
 
       <?php if ( count($all_images) > 1 ) : ?>
       <div class="sp-thumbs" role="tablist" aria-label="Vues">
-        <?php foreach ( $all_images as $i => $img_id ) : ?>
+        <?php foreach ( $all_images as $i => $img_id ) :
+          $full_url  = wp_get_attachment_image_url( $img_id, 'large' );
+          $thumb_url = wp_get_attachment_image_url( $img_id, [72,72] );
+        ?>
           <button
             class="sp-thumb <?php echo $i === 0 ? 'is-active' : ''; ?>"
             role="tab"
             aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"
-            data-full="<?php echo esc_url( wp_get_attachment_image_url( $img_id, 'large' ) ); ?>"
+            data-full="<?php echo esc_url( $full_url ); ?>"
+            data-thumb="<?php echo esc_url( $thumb_url ); ?>"
             aria-label="Image <?php echo esc_attr($i + 1); ?>">
-            <?php echo wp_get_attachment_image( $img_id, [72,72], false, ['loading'=>'lazy'] ); ?>
+            <img src="<?php echo esc_url( $thumb_url ); ?>" alt="" width="72" height="72" loading="lazy">
           </button>
         <?php endforeach; ?>
       </div>
@@ -81,7 +86,7 @@ if ( $is_variable ) {
     <!-- PANNEAU ACHAT -->
     <div class="sp-buy">
 
-      <!-- Fil d'Ariane -->
+      <!-- Fil d’Ariane -->
       <nav aria-label="Fil d’Ariane" class="sp-crumb">
         <a href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
         <span aria-hidden="true">/</span>
@@ -98,28 +103,19 @@ if ( $is_variable ) {
       <div class="sp-stars-row" aria-label="Note : <?php echo esc_attr(round($avg,1)); ?>/5 (<?php echo esc_attr($rating_cnt); ?> avis)">
         <span class="sp-stars" aria-hidden="true"><?php
           for ( $s = 1; $s <= 5; $s++ ) :
-            if      ( $s <= floor($avg)   ) echo '<svg class="star star-on"   viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
-            elseif  ( $s <= $avg + 0.5    ) echo '<svg class="star star-half" viewBox="0 0 16 16"><path d="M8 1v9.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77z" fill="none" stroke="currentColor" stroke-width=".8"/></svg>';
-            else                            echo '<svg class="star star-off"  viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+            if      ( $s <= floor($avg) )  echo '<svg class="star star-on" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/></svg>';
+            elseif  ( $s <= $avg + 0.5 )   echo '<svg class="star star-half" viewBox="0 0 16 16"><path d="M8 1v9.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="currentColor"/><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77z" fill="none" stroke="currentColor" stroke-width=".8"/></svg>';
+            else                            echo '<svg class="star star-off" viewBox="0 0 16 16"><path d="M8 1l1.85 3.74L14 5.68l-3 2.92.7 4.12L8 10.77l-3.7 1.95L5 8.6 2 5.68l4.15-.94z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
           endfor;
         ?></span>
         <span class="sp-review-count"><?php echo esc_html($rating_cnt); ?> avis</span>
       </div>
       <?php endif; ?>
 
-      <!-- =============================================================
-           PRIX — DEUX BLOCS
-           #spPriceBase    : toujours présent, affiché par défaut
-                             Contient le prix WooCommerce brut
-                             ("A partir de XX €" ou prix simple)
-           #spPriceVariant : caché par défaut, affiché par JS
-                             quand une variation est sélectionnée
-      ============================================================== -->
-      <div id="spPriceBase">
-        <?php echo $base_price_html; ?>
-      </div>
-      <div id="spPriceVariant" aria-live="polite"></div>
-      <!-- ============================================================= -->
+      <!-- PRIX BASE (avant sélection) -->
+      <div id="spPriceBase"><?php echo $base_price_html; ?></div>
+      <!-- PRIX VARIATION (après sélection, injecté par JS) -->
+      <div id="spPriceVariant" style="display:none" aria-live="polite"></div>
 
       <?php if ( $short_desc ) : ?>
         <div class="sp-short"><?php echo wp_kses_post($short_desc); ?></div>
@@ -133,29 +129,19 @@ if ( $is_variable ) {
       <!-- Garanties -->
       <ul class="sp-guarantees">
         <li>
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="2" y="4" width="12" height="10" rx="2"/>
-            <path d="M14 8h2.5a1 1 0 011 1v4a2 2 0 01-4 0V9a1 1 0 01.5-.87z"/>
-          </svg>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="10" rx="2"/><path d="M14 8h2.5a1 1 0 011 1v4a2 2 0 01-4 0V9a1 1 0 01.5-.87z"/></svg>
           <span>Livraison offerte dès <strong>35 €</strong></span>
         </li>
         <li>
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M17 4l-1.5 12H4.5L3 4"/><path d="M1 4h18M8 4V2h4v2"/>
-          </svg>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 4l-1.5 12H4.5L3 4"/><path d="M1 4h18M8 4V2h4v2"/></svg>
           <span>Retours gratuits <strong>30 jours</strong></span>
         </li>
         <li>
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M10 18s7-4 7-9V4l-7-2-7 2v5c0 5 7 9 7 9z"/>
-          </svg>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 18s7-4 7-9V4l-7-2-7 2v5c0 5 7 9 7 9z"/></svg>
           <span>Garantie <strong>2 ans</strong></span>
         </li>
         <li>
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="1" y="5" width="18" height="12" rx="2"/>
-            <line x1="1" y1="9" x2="19" y2="9"/>
-          </svg>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="5" width="18" height="12" rx="2"/><line x1="1" y1="9" x2="19" y2="9"/></svg>
           <span>CB &middot; PayPal &middot; Apple Pay</span>
         </li>
       </ul>
@@ -238,9 +224,9 @@ if ( !empty($related) ) :
     </div>
     <div class="products-grid">
       <?php foreach ( $related as $rid ) :
-        $rp  = wc_get_product($rid);
+        $rp   = wc_get_product($rid);
         if (!$rp || !$rp->is_visible()) continue;
-        $rb  = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
+        $rb   = function_exists('chg_card_badge') ? chg_card_badge($rp) : null;
         $rtid = $rp->get_image_id();
       ?>
         <article class="product-card" data-product-id="<?php echo esc_attr($rid); ?>">
@@ -267,7 +253,7 @@ if ( !empty($related) ) :
 
 </div><!-- /sp-page -->
 
-<!-- STICKY ATC bar ------------------------------------------------------ -->
+<!-- STICKY BAR ---------------------------------------------------------- -->
 <div class="sp-sticky" id="spSticky" aria-hidden="true">
   <div class="sp-sticky-in">
     <?php if ( $image_id ) :
@@ -288,117 +274,130 @@ jQuery(function($){
 
   /* ---- éléments DOM ---- */
   var $form        = $('form.variations_form');
-  var mainImg      = document.getElementById('spMainImg');
+  var $mainImg     = $('#spMainImg');
   var $thumbs      = $('.sp-thumb');
   var $priceBase   = $('#spPriceBase');
   var $priceVar    = $('#spPriceVariant');
   var $stickyPrice = $('#spStickyPrice');
   var $stickyImg   = $('#spStickyImg');
-  var $spForm      = $('#spForm');
+  var $spFormWrap  = $('#spForm');
   var $sticky      = $('#spSticky');
   var $stickyBtn   = $('#spStickyBtn');
 
-  /* Prix de base original (pour le reset) */
+  /* URL de l'image principale de base (pour le reset) */
+  var baseImgSrc   = <?php echo json_encode($main_img_url); ?>;
   var basePriceHTML = $priceBase.html();
 
   /* ---------------------------------------------------------------
-     1. GALERIE : swap au clic miniature
+     1. GALERIE : swap image principale
   --------------------------------------------------------------- */
-  function swapMainImg(src, activeThumb) {
-    if (!mainImg || !src) return;
-    mainImg.style.opacity = '0';
-    mainImg.src = src;
-    mainImg.onload = function() { mainImg.style.opacity = '1'; };
-    if (activeThumb !== null) {
-      $thumbs.removeClass('is-active').attr('aria-selected','false');
-      if (activeThumb) $(activeThumb).addClass('is-active').attr('aria-selected','true');
+  function swapImg(src, $activeThumb) {
+    if (!src) return;
+    /* Cas 1 : élément <img> existant */
+    var imgEl = $mainImg[0];
+    if (imgEl && imgEl.tagName === 'IMG') {
+      imgEl.style.opacity = '0';
+      imgEl.src = src;
+      imgEl.onload = function() { imgEl.style.opacity = '1'; };
+    } else if (imgEl) {
+      /* Cas 2 : placeholder div — on crée un img */
+      var newImg = document.createElement('img');
+      newImg.id      = 'spMainImg';
+      newImg.src     = src;
+      newImg.alt     = '';
+      newImg.className = 'sp-main-img';
+      imgEl.replaceWith(newImg);
+      $mainImg = $('#spMainImg');
+    }
+    /* Miniatures */
+    $thumbs.removeClass('is-active').attr('aria-selected','false');
+    if ($activeThumb && $activeThumb.length) {
+      $activeThumb.addClass('is-active').attr('aria-selected','true');
     }
   }
 
+  /* Clic miniature */
   $thumbs.on('click', function() {
-    swapMainImg($(this).data('full'), this);
+    swapImg($(this).data('full'), $(this));
   });
 
   /* ---------------------------------------------------------------
-     2. BADGE ÉCONOMIE helper
+     2. Badge économie
   --------------------------------------------------------------- */
-  function saveBadgeHTML(variation) {
+  function saveBadge(variation) {
     var reg = parseFloat(variation.display_regular_price) || 0;
     var cur = parseFloat(variation.display_price)         || 0;
     if (reg > cur && cur > 0) {
       var save = Math.round(reg - cur);
-      return ' <span class="sp-price-save">− ' + save + ' €</span>';
+      return '<span class="sp-price-save">− ' + save + ' €</span>';
     }
     return '';
   }
 
   /* ---------------------------------------------------------------
-     3. ÉVÉNEMENTS VARIATION WooCommerce
+     3. Événements variation WooCommerce
+     WooCommerce 8+ : variation.image.url (pas full_src)
+     Fallbacks dans l’ordre : url > full_src > gallery_thumbnail_src
   --------------------------------------------------------------- */
   if ($form.length) {
 
-    /* Variation trouvée ————————————————————— */
     $form.on('found_variation', function(e, variation) {
 
-      /* 3a. Image */
-      if (variation.image && variation.image.full_src) {
-        swapMainImg(variation.image.full_src, null);
-        $thumbs.removeClass('is-active').attr('aria-selected','false');
-        if ($stickyImg.length && variation.image.thumb_src) {
-          $stickyImg.attr('src', variation.image.thumb_src);
+      /* — Image — */
+      var img = variation.image || {};
+      var newSrc = img.url || img.full_src || img.gallery_thumbnail_src || '';
+      if (newSrc && newSrc !== window.location.href) {
+        swapImg(newSrc, null);
+        /* Sticky image */
+        if ($stickyImg.length) {
+          var thumbSrc = img.thumb_src || img.src || newSrc;
+          $stickyImg.attr('src', thumbSrc);
         }
       }
 
-      /* 3b. Prix : masquer le prix de base, afficher le prix de la variation */
-      if (variation.price_html) {
+      /* — Prix — */
+      var priceHtml = variation.price_html || '';
+      if (priceHtml) {
         $priceBase.hide();
-        $priceVar
-          .html(variation.price_html + saveBadgeHTML(variation))
-          .css('display','block');
-        /* Sticky prix */
-        $stickyPrice.html(variation.price_html);
+        $priceVar.html(priceHtml + saveBadge(variation)).show();
+        $stickyPrice.html(priceHtml);
       }
     });
 
-    /* Reset (désélection) ————————————————————— */
     $form.on('reset_data', function() {
-
-      /* Image : 1ère miniature */
+      /* Image : revenir à l’image principale du produit */
       var $first = $thumbs.first();
-      if ($first.length && mainImg) {
-        swapMainImg($first.data('full'), $first[0]);
-      }
+      var resetSrc = baseImgSrc || ($first.length ? $first.data('full') : '');
+      swapImg(resetSrc, $first.length ? $first : null);
       if ($stickyImg.length && $first.length) {
-        $stickyImg.attr('src', $first.find('img').attr('src') || '');
+        $stickyImg.attr('src', $first.data('thumb') || $first.find('img').attr('src') || '');
       }
-
-      /* Prix : cacher la variation, réafficher le prix de base */
+      /* Prix */
       $priceVar.hide().empty();
       $priceBase.show().html(basePriceHTML);
-      /* Sticky : revenir au prix minimum */
       $stickyPrice.html(basePriceHTML);
     });
   }
 
   /* ---------------------------------------------------------------
-     4. STICKY BAR (IntersectionObserver)
+     4. Sticky bar
   --------------------------------------------------------------- */
-  if ($spForm.length && $sticky.length) {
+  if ($spFormWrap.length && $sticky.length) {
     var io = new IntersectionObserver(function(entries) {
-      var out = !entries[0].isIntersecting;
-      $sticky.toggleClass('is-visible', out).attr('aria-hidden', out ? 'false' : 'true');
+      var hidden = !entries[0].isIntersecting;
+      $sticky.toggleClass('is-visible', hidden).attr('aria-hidden', hidden ? 'false' : 'true');
     }, { threshold: 0.1 });
-    io.observe($spForm[0]);
+    io.observe($spFormWrap[0]);
   }
 
   $stickyBtn.on('click', function() {
-    var $btn = $spForm.find('.single_add_to_cart_button:not(.disabled), button[type="submit"]:not(:disabled)').first();
+    var $btn = $spFormWrap.find('.single_add_to_cart_button:not(.disabled)').first();
     if ($btn.length) $btn.trigger('click');
-    else $spForm[0] && $spForm[0].scrollIntoView({ behavior:'smooth', block:'center' });
+    else if ($spFormWrap[0]) $spFormWrap[0].scrollIntoView({ behavior:'smooth', block:'center' });
   });
 
   /* ---------------------------------------------------------------
-     5. ACCORDIONS
+     5. Accordions
   --------------------------------------------------------------- */
   $('.sp-acc-btn').on('click', function() {
     var $btn   = $(this);
@@ -406,23 +405,21 @@ jQuery(function($){
     var $panel = $('#' + $btn.attr('aria-controls'));
     if (!$panel.length) return;
 
-    /* Fermer les autres */
     $('.sp-acc-btn[aria-expanded="true"]').not($btn).each(function() {
-      var $ob = $(this);
-      var $op = $('#' + $ob.attr('aria-controls'));
+      var $ob = $(this), $op = $('#' + $ob.attr('aria-controls'));
       $ob.attr('aria-expanded','false');
-      $op.css({ height:$op[0].scrollHeight+'px', overflow:'hidden' });
+      $op.css({ height: $op[0].scrollHeight + 'px', overflow:'hidden' });
       requestAnimationFrame(function(){
-        $op.css({ transition:'height .3s ease,opacity .25s', height:'0', opacity:'0' });
+        $op.css({ transition:'height .3s ease, opacity .25s', height:'0', opacity:'0' });
         $op.one('transitionend', function(){ $op.prop('hidden',true).css('',''); });
       });
     });
 
     if (isOpen) {
       $btn.attr('aria-expanded','false');
-      $panel.css({ height:$panel[0].scrollHeight+'px', overflow:'hidden' });
+      $panel.css({ height: $panel[0].scrollHeight + 'px', overflow:'hidden' });
       requestAnimationFrame(function(){
-        $panel.css({ transition:'height .3s ease,opacity .25s', height:'0', opacity:'0' });
+        $panel.css({ transition:'height .3s ease, opacity .25s', height:'0', opacity:'0' });
         $panel.one('transitionend', function(){ $panel.prop('hidden',true).css('',''); });
       });
     } else {
@@ -430,13 +427,13 @@ jQuery(function($){
       $panel.prop('hidden',false).css({ height:'0', opacity:'0', overflow:'hidden' });
       var h = $panel[0].scrollHeight;
       requestAnimationFrame(function(){
-        $panel.css({ transition:'height .3s ease,opacity .25s', height:h+'px', opacity:'1' });
+        $panel.css({ transition:'height .3s ease, opacity .25s', height:h+'px', opacity:'1' });
         $panel.one('transitionend', function(){ $panel.css({ height:'', overflow:'' }); });
       });
     }
   });
 
-}); /* end jQuery ready */
+});
 </script>
 
 <?php endwhile; get_footer(); ?>
