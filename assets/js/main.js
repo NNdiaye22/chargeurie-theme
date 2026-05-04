@@ -1,4 +1,4 @@
-/* Chargeurie — main.js v3.1 | GSAP + burger + responsive */
+/* Chargeurie — main.js v3.2 | GSAP + burger + responsive */
 /* global gsap, ScrollTrigger, chgData */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Nav couleur ────────────────────────────────────
   const nav = document.getElementById('nav');
   if (nav) {
+    // Pages intérieures sans section hero → nav visible immédiatement
+    if (!document.querySelector('.hero')) {
+      nav.classList.add('light', 'scrolled');
+    }
+
     ScrollTrigger.create({
       trigger: '.hero', start: 'bottom top',
       onEnter:     () => nav.classList.add('scrolled', 'light'),
@@ -131,16 +136,15 @@ document.addEventListener('DOMContentLoaded', function () {
         this.x     = W * Math.random();
         this.y     = H + 20;
         this.vx    = (Math.random() - .5) * .7;
-        this.vy    = -(Math.random() * 1.8 + .6);  // monte plus vite
-        this.alpha = Math.random() * .7 + .35;      // plus opaque (0.35–1.0)
-        this.r     = Math.random() * 3 + 1;         // plus grosse (1–4px)
+        this.vy    = -(Math.random() * 1.8 + .6);
+        this.alpha = Math.random() * .7 + .35;
+        this.r     = Math.random() * 3 + 1;
         this.color = Math.random() > .45 ? '#0071e3' : '#2997ff';
       };
       this.reset();
-      this.y = Math.random() * H; // position initiale aléatoire
+      this.y = Math.random() * H;
     }
 
-    // 140 particules au lieu de 80
     for (let i = 0; i < 140; i++) particles.push(new Particle());
 
     function draw() {
@@ -148,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
       particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha -= .0018; // disparition plus lente
+        p.alpha -= .0018;
         if (p.alpha <= 0 || p.y < -20) p.reset();
         ctx.globalAlpha = p.alpha;
         ctx.beginPath();

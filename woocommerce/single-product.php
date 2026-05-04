@@ -71,33 +71,60 @@ while ( have_posts() ) :
       <ul class="sp-trust">
         <li>
           <span class="trust-icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M8 1.5L2.5 8H7L5.5 12.5L12 6H7.5L8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-          </span>
-          <span>Charge rapide <strong>60 W</strong></span>
-        </li>
-        <li>
-          <span class="trust-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M1 9V5a1 1 0 011-1h6v5M1 9h8M1 9a1.5 1.5 0 003 0m5 0a1.5 1.5 0 003 0M12 9V7.5L10 5H8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
-          <span>Livraison offerte dès <strong>35 €</strong></span>
+          <span>Livraison offerte dès <strong>35 €</strong> &middot; reçue en <strong>3&ndash;4 j</strong> ouvrés</span>
         </li>
         <li>
           <span class="trust-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M2 7A5 5 0 107 2H4m0 0L2 4m2-2L6 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
-          <span>Retours sous <strong>30 jours</strong></span>
+          <span>Retours sous <strong>30 jours</strong></span>
         </li>
         <li>
           <span class="trust-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M7 1L2 3V7c0 2.8 2.2 4.7 5 5.5C9.8 11.7 12 9.8 12 7V3L7 1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
           </span>
-          <span>Garantie <strong>2 ans</strong></span>
+          <span>Garantie <strong>2 ans</strong></span>
         </li>
       </ul>
 
+      <?php
+      // Attributs produit visibles (hors variations)
+      $sp_attributes = array_filter(
+        $product->get_attributes(),
+        fn($a) => $a->get_visible()
+      );
+      if ( ! empty( $sp_attributes ) ) :
+      ?>
+      <details class="sp-accordion" open>
+        <summary class="sp-accordion-title">Caractéristiques</summary>
+        <div class="sp-accordion-body">
+          <dl class="sp-attrs-list">
+            <?php foreach ( $sp_attributes as $attribute ) :
+              $attr_name = wc_attribute_label( $attribute->get_name(), $product );
+              if ( $attribute->is_taxonomy() ) {
+                $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), [ 'fields' => 'names' ] );
+                $attr_value = ( ! is_wp_error( $terms ) && ! empty( $terms ) ) ? implode( ', ', $terms ) : '';
+              } else {
+                $options    = $attribute->get_options();
+                $attr_value = ! empty( $options ) ? implode( ', ', $options ) : '';
+              }
+              if ( ! $attr_value ) continue;
+            ?>
+              <div class="sp-attr-row">
+                <dt><?php echo esc_html( $attr_name ); ?></dt>
+                <dd><?php echo esc_html( $attr_value ); ?></dd>
+              </div>
+            <?php endforeach; ?>
+          </dl>
+        </div>
+      </details>
+      <?php endif; ?>
+
       <?php $desc = $product->get_description(); ?>
       <?php if ($desc) : ?>
-        <details class="sp-accordion" open>
+        <details class="sp-accordion">
           <summary class="sp-accordion-title">Description</summary>
           <div class="sp-accordion-body"><?php echo wp_kses_post($desc); ?></div>
         </details>
@@ -106,14 +133,14 @@ while ( have_posts() ) :
       <details class="sp-accordion">
         <summary class="sp-accordion-title">Compatibilité</summary>
         <div class="sp-accordion-body">
-          <p>Compatible avec tous les appareils USB-C : iPhone 15+, Samsung, Google Pixel, MacBook, iPad et tout appareil à port USB-C.</p>
+          <p>Compatible avec tous les appareils USB-C : iPhone 15+, Samsung, Google Pixel, MacBook, iPad et tout appareil à port USB-C.</p>
         </div>
       </details>
 
       <details class="sp-accordion">
-        <summary class="sp-accordion-title">Livraison & Retours</summary>
+        <summary class="sp-accordion-title">Livraison &amp; Retours</summary>
         <div class="sp-accordion-body">
-          <p>Expédition sous 24 h (jours ouvrables). Livraison offerte dès 35 € d’achat. Retours acceptables sous 30 jours — produit non utilisé dans son emballage d’origine.</p>
+          <p>Expédition sous 24 h (jours ouvrables). Livraison offerte dès 35 € d'achat, reçue en 3 à 4 jours ouvrés. Retours acceptés sous 30 jours — produit non utilisé dans son emballage d'origine.</p>
         </div>
       </details>
 

@@ -272,12 +272,12 @@
   cursor: not-allowed !important;
 }
 
-/* ── Trust strip ─── */
+/* ── Trust strip (3 items, colonne unique) ─── */
 .sp-trust {
   list-style: none;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .9rem 2rem;
+  grid-template-columns: 1fr;
+  gap: .9rem;
   padding: 1.8rem 0;
   border-top: 1px solid var(--mid);
   border-bottom: 1px solid var(--mid);
@@ -302,6 +302,36 @@
   align-items: center;
   justify-content: center;
   color: var(--ink);
+}
+
+/* ── Attributs produit ─── */
+.sp-attrs-list {
+  display: flex;
+  flex-direction: column;
+}
+.sp-attr-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--mid);
+}
+.sp-attr-row:last-child { border-bottom: none; }
+.sp-attr-row dt {
+  font-size: .5rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--stone);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.sp-attr-row dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: .8rem;
+  font-weight: 500;
+  text-align: right;
 }
 
 /* ── Accordions ─── */
@@ -372,7 +402,6 @@ details[open] .sp-accordion-title::after { content: '\2212'; } /* minus sign */
 @media (max-width: 600px) {
   .chg-single-product { padding-bottom: 5rem; }
   .sp-title { font-size: clamp(1.7rem, 8vw, 2.4rem); }
-  .sp-trust { grid-template-columns: 1fr; gap: .8rem; }
   .sp-form .woocommerce-variation-add-to-cart,
   .sp-form form.cart { flex-direction: column; align-items: stretch; }
   .sp-form .quantity { justify-content: center; }
