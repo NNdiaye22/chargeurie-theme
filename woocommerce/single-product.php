@@ -1,7 +1,7 @@
 <?php
 /**
- * Chargeurie — single-product.php v10
- * found_variation sur $(document) — fix image swap
+ * Chargeurie — single-product.php v10.1
+ * found_variation sur $(document) — fix image swap — PHP 7.0+ compat
  */
 get_header();
 while ( have_posts() ) : the_post();
@@ -11,13 +11,13 @@ $image_id    = $product->get_image_id();
 $gallery     = $product->get_gallery_image_ids();
 $short_desc  = $product->get_short_description();
 $long_desc   = $product->get_description();
-$attributes  = array_filter( $product->get_attributes(), fn($a) => $a->get_visible() );
+$attributes  = array_filter( $product->get_attributes(), function($a) { return $a->get_visible(); } );
 $rating_cnt  = $product->get_rating_count();
 $avg         = (float) $product->get_average_rating();
 $badge       = function_exists('chg_card_badge') ? chg_card_badge($product) : null;
 $is_variable = $product->is_type('variable');
 
-$all_images = [];
+$all_images = array();
 if ( $image_id ) $all_images[] = $image_id;
 foreach ( $gallery as $gid ) $all_images[] = $gid;
 
@@ -38,8 +38,6 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
         <?php endif; ?>
 
         <?php if ( $image_id ) :
-          // On génère l'image SANS srcset (sizes) pour éviter que le navigateur
-          // choisisse une autre source que celle qu'on set en JS
           $img_src = wp_get_attachment_image_url( $image_id, 'large' );
         ?>
           <img
@@ -84,7 +82,7 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
     <!-- PANNEAU ACHAT -->
     <div class="sp-buy">
 
-      <nav aria-label="Fil d’Ariane" class="sp-crumb">
+      <nav aria-label="Fil d'Ariane" class="sp-crumb">
         <a href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
         <span aria-hidden="true">/</span>
         <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Boutique</a>
@@ -119,7 +117,7 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
       </div>
 
       <ul class="sp-guarantees">
-        <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="10" rx="2"/><path d="M14 8h2.5a1 1 0 011 1v4a2 2 0 01-4 0V9a1 1 0 01.5-.87z"/></svg><span>Livraison offerte dès <strong>35 €</strong></span></li>
+        <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="10" rx="2"/><path d="M14 8h2.5a1 1 0 011 1v4a2 2 0 01-4 0V9a1 1 0 01.5-.87z"/></svg><span>Livraison offerte d&egrave;s <strong>35&nbsp;&euro;</strong></span></li>
         <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 4l-1.5 12H4.5L3 4"/><path d="M1 4h18M8 4V2h4v2"/></svg><span>Retours gratuits <strong>30 jours</strong></span></li>
         <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 18s7-4 7-9V4l-7-2-7 2v5c0 5 7 9 7 9z"/></svg><span>Garantie <strong>2 ans</strong></span></li>
         <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="5" width="18" height="12" rx="2"/><line x1="1" y1="9" x2="19" y2="9"/></svg><span>CB &middot; PayPal &middot; Apple Pay</span></li>
@@ -135,13 +133,13 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
   <div class="sp-container">
     <div class="sp-section-head">
       <span class="sp-tag">Fiche technique</span>
-      <h2 class="sp-section-title">Caractéristiques</h2>
+      <h2 class="sp-section-title">Caract&eacute;ristiques</h2>
     </div>
     <dl class="sp-specs-grid">
       <?php foreach ( $attributes as $attribute ) :
         $label = wc_attribute_label( $attribute->get_name(), $product );
         if ( $attribute->is_taxonomy() ) {
-          $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), ['fields'=>'names'] );
+          $terms = wp_get_post_terms( $product->get_id(), $attribute->get_name(), array('fields'=>'names') );
           $val   = (!is_wp_error($terms) && !empty($terms)) ? implode(', ', $terms) : '';
         } else {
           $opts = $attribute->get_options();
@@ -162,23 +160,23 @@ $main_img_url    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' )
     <?php if ( $long_desc ) : ?>
     <div class="sp-desc">
       <span class="sp-tag">Description</span>
-      <h2 class="sp-section-title sp-section-title--sm">Détails</h2>
+      <h2 class="sp-section-title sp-section-title--sm">D&eacute;tails</h2>
       <div class="sp-desc-body"><?php echo wp_kses_post($long_desc); ?></div>
     </div>
     <?php endif; ?>
     <div class="sp-faq <?php echo $long_desc ? '' : 'sp-faq--full'; ?>">
       <div class="sp-acc-list">
         <div class="sp-acc">
-          <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-compat">Compatibilité<svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
-          <div id="acc-compat" class="sp-acc-panel" hidden>Compatible avec tous les appareils USB-C : iPhone 15+, Samsung Galaxy, Google Pixel, MacBook Air/Pro, iPad Pro.</div>
+          <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-compat">Compatibilit&eacute;<svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
+          <div id="acc-compat" class="sp-acc-panel" hidden>Compatible avec tous les appareils USB-C&nbsp;: iPhone 15+, Samsung Galaxy, Google Pixel, MacBook Air/Pro, iPad Pro.</div>
         </div>
         <div class="sp-acc">
           <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-livraison">Livraison &amp; Retours<svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
-          <div id="acc-livraison" class="sp-acc-panel" hidden>Expédition 24 h ouvrable. Livraison offerte dès 35 €, reçue en 3–4 jours. Retours acceptés sous 30 jours.</div>
+          <div id="acc-livraison" class="sp-acc-panel" hidden>Exp&eacute;dition 24&nbsp;h ouvrable. Livraison offerte d&egrave;s 35&nbsp;&euro;, re&ccedil;ue en 3&ndash;4 jours. Retours accept&eacute;s sous 30 jours.</div>
         </div>
         <div class="sp-acc">
           <button class="sp-acc-btn" aria-expanded="false" aria-controls="acc-garantie">Garantie<svg class="sp-acc-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
-          <div id="acc-garantie" class="sp-acc-panel" hidden>Garantie constructeur 2 ans. Retour ou échange sans condition dans les 30 premiers jours.</div>
+          <div id="acc-garantie" class="sp-acc-panel" hidden>Garantie constructeur 2 ans. Retour ou &eacute;change sans condition dans les 30 premiers jours.</div>
         </div>
       </div>
     </div>
@@ -206,7 +204,7 @@ if ( !empty($related) ) :
         <article class="product-card" data-product-id="<?php echo esc_attr($rid); ?>">
           <a class="card-img-wrap" href="<?php echo esc_url(get_permalink($rid)); ?>" tabindex="-1" aria-hidden="true">
             <?php if ($rb) : ?><div class="card-badge badge-<?php echo esc_attr($rb['id']); ?>"><?php echo $rb['label']; ?></div><?php endif; ?>
-            <?php if ($rtid) echo wp_get_attachment_image($rtid,'chg-product-card',false,['class'=>'slide-product-img','loading'=>'lazy']);
+            <?php if ($rtid) echo wp_get_attachment_image($rtid,'chg-product-card',false,array('class'=>'slide-product-img','loading'=>'lazy'));
             else : ?><div class="card-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><?php endif; ?>
           </a>
           <div class="card-info">
@@ -228,7 +226,7 @@ if ( !empty($related) ) :
 <!-- STICKY BAR ----------------------------------------------------------- -->
 <div class="sp-sticky" id="spSticky" aria-hidden="true">
   <div class="sp-sticky-in">
-    <?php if ($image_id) echo wp_get_attachment_image($image_id,[44,44],false,['class'=>'sp-sticky-img','id'=>'spStickyImg','loading'=>'lazy']); ?>
+    <?php if ($image_id) echo wp_get_attachment_image($image_id,array(44,44),false,array('class'=>'sp-sticky-img','id'=>'spStickyImg','loading'=>'lazy')); ?>
     <span class="sp-sticky-name"><?php the_title(); ?></span>
     <span class="sp-sticky-price" id="spStickyPrice"><?php echo $base_price_html; ?></span>
     <button class="sp-sticky-btn" id="spStickyBtn" type="button">Ajouter au panier</button>
@@ -239,7 +237,6 @@ if ( !empty($related) ) :
 (function($){
   'use strict';
 
-  // On attend que WooCommerce soit prêt
   $(document).ready(function() {
 
     var imgEl        = document.getElementById('spMainImg');
@@ -255,10 +252,7 @@ if ( !empty($related) ) :
     var baseImgSrc    = <?php echo json_encode( (string)$main_img_url ); ?>;
     var basePriceHTML = $priceBase.html();
 
-    /* -----------------------------------------------------------
-       SWAP IMAGE : remplace src ET supprime srcset/sizes
-       pour que le navigateur n’override pas avec srcset
-    ----------------------------------------------------------- */
+    /* SWAP IMAGE : supprime srcset pour eviter override navigateur */
     function swapImg(src, $activeThumb) {
       if (!src || !imgEl) return;
       imgEl.style.opacity = '0';
@@ -280,36 +274,20 @@ if ( !empty($related) ) :
       swapImg($(this).data('full'), $(this));
     });
 
-    /* -----------------------------------------------------------
-       ÉCOUTE SUR $(document) — c’est le bon pattern WooCommerce
-       WC déclenche found_variation et reset_data sur le document
-    ----------------------------------------------------------- */
+    /* found_variation ecoute sur $(document) — pattern correct WooCommerce 3+ */
     $(document).on('found_variation.chg', function(e, variation) {
       console.log('[CHG] found_variation:', variation);
 
-      /* IMAGE — WooCommerce 8+ : variation.image est un objet avec :
-         url, full_src, full_src_w, full_src_h, src, src_w, src_h,
-         thumb_src, thumb_src_w, thumb_src_h, srcset, sizes,
-         image_id, alt, title, caption, description, data
-      */
       var img = variation.image || {};
       console.log('[CHG] image object:', img);
 
-      var newSrc = img.url        // WC 8+
-                || img.full_src   // WC < 8
-                || img.src        // fallback
-                || '';
+      var newSrc = img.url || img.full_src || img.src || '';
 
-      // On ne change l'image que si WC en fournit une différente
-      // et que ce n'est pas juste l'URL courante de la page
-      if (newSrc && newSrc !== window.location.href && newSrc !== baseImgSrc) {
+      if (newSrc && newSrc !== window.location.href) {
         swapImg(newSrc, null);
         if ($stickyImg.length) {
           $stickyImg.attr('src', img.thumb_src || img.src || newSrc);
         }
-      } else if (newSrc === baseImgSrc) {
-        // Variation utilise la même image que le produit parent — OK, pas de swap nécessaire
-        console.log('[CHG] image identique au produit parent, pas de swap.');
       }
 
       /* PRIX */
@@ -323,21 +301,17 @@ if ( !empty($related) ) :
 
     $(document).on('reset_data.chg', function() {
       console.log('[CHG] reset_data');
-      /* Image : revenir à l’image du produit parent */
       var $first = $thumbs.first();
-      swapImg(baseImgSrc || $first.data('full') || '', $first.length ? $first : null);
+      swapImg(baseImgSrc || ($first.length ? $first.data('full') : '') || '', $first.length ? $first : null);
       if ($stickyImg.length && $first.length) {
         $stickyImg.attr('src', $first.data('thumb') || '');
       }
-      /* Prix */
       $priceVar.hide().empty();
       $priceBase.show().html(basePriceHTML);
       $stickyPrice.html(basePriceHTML);
     });
 
-    /* -----------------------------------------------------------
-       STICKY BAR
-    ----------------------------------------------------------- */
+    /* STICKY BAR */
     if ($spFormWrap.length && $sticky.length) {
       var io = new IntersectionObserver(function(entries) {
         var hidden = !entries[0].isIntersecting;
@@ -352,9 +326,7 @@ if ( !empty($related) ) :
       else if ($spFormWrap[0]) $spFormWrap[0].scrollIntoView({ behavior:'smooth', block:'center' });
     });
 
-    /* -----------------------------------------------------------
-       ACCORDIONS
-    ----------------------------------------------------------- */
+    /* ACCORDIONS */
     $('.sp-acc-btn').on('click', function() {
       var $btn   = $(this);
       var isOpen = $btn.attr('aria-expanded') === 'true';
