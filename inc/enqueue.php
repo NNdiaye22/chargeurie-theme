@@ -18,6 +18,11 @@ function chg_enqueue_assets() {
         wp_enqueue_style( 'chg-shop', CHG_URI . '/assets/css/shop.css', [ 'chg-main', 'chg-woocommerce' ], CHG_VERSION );
     }
 
+    // CSS dédié fiche produit — chargé uniquement sur is_product()
+    if ( class_exists( 'WooCommerce' ) && is_product() ) {
+        wp_enqueue_style( 'chg-product', CHG_URI . '/assets/css/product.css', [ 'chg-main', 'chg-woocommerce', 'chg-shop' ], CHG_VERSION );
+    }
+
     wp_enqueue_script( 'gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', [], '3.12.5', true );
     wp_enqueue_script( 'gsap-scrolltrigger', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js', [ 'gsap' ], '3.12.5', true );
     wp_enqueue_script( 'chg-main', CHG_URI . '/assets/js/main.js', [ 'gsap', 'gsap-scrolltrigger' ], CHG_VERSION, true );
