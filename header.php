@@ -17,15 +17,40 @@
 <!-- MOBILE MENU OVERLAY -->
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Menu principal">
   <div class="mobile-menu-inner">
+    <?php
+    // Récupère les items du menu "primary" pour les afficher en version mobile
+    $primary_menu = wp_get_nav_menu_items(
+        wp_get_nav_menu_object(
+            get_nav_menu_locations()['primary'] ?? 0
+        )->term_id ?? 0
+    );
+    ?>
     <ul class="mobile-links">
-      <?php
-      $shop_url = class_exists( 'WooCommerce' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : '#';
+      <?php if ( $primary_menu ) :
+        foreach ( $primary_menu as $item ) :
+          if ( (int) $item->menu_item_parent !== 0 ) continue; // items de premier niveau uniquement
       ?>
-      <li><a href="<?php echo esc_url( $shop_url ); ?>">Produits</a></li>
-      <li><a href="#reveal">La Lanière</a></li>
-      <li><a href="#manifesto">Notre ADN</a></li>
-      <li><a href="#nl">Contact</a></li>
+        <li>
+          <a href="<?php echo esc_url( $item->url ); ?>"
+            <?php if ( $item->target ) echo 'target="' . esc_attr( $item->target ) . '"'; ?>
+          >
+            <?php echo esc_html( $item->title ); ?>
+          </a>
+        </li>
+      <?php endforeach;
+      else :
+        // Fallback si aucun menu n'est assigné à "primary"
+        $shop_url = class_exists( 'WooCommerce' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : '#';
+      ?>
+        <li><a href="<?php echo esc_url( $shop_url ); ?>">Produits</a></li>
+        <li><a href="#reveal">La Lanière</a></li>
+        <li><a href="#manifesto">Notre ADN</a></li>
+        <li><a href="#nl">Contact</a></li>
+      <?php endif; ?>
     </ul>
+    <?php
+    $shop_url = class_exists( 'WooCommerce' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : '#';
+    ?>
     <a href="<?php echo esc_url( $shop_url ); ?>" class="mobile-cta btn-dark">Commander &rarr;</a>
     <div class="mobile-meta">USB-C &middot; 60W &middot; France</div>
   </div>
