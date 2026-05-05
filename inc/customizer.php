@@ -111,22 +111,22 @@ function chg_customizer_register( $wp_customize ) {
     // ================================================================
     $wp_customize->add_section( 'chg_gamme', array(
         'title'       => "Page d'accueil — Section Gamme",
-        'description' => 'Modifiez le titre, le tag et les produits affichés dans la section grille de la page accueil.',
+        'description' => 'Choisissez la catégorie à afficher, le nombre de produits et personnalisez les textes.',
         'panel'       => 'chg_panel',
     ) );
 
-    // Tag (petit texte au-dessus du titre)
+    // Tag
     $wp_customize->add_setting( 'chg_gamme_tag', array(
         'default'           => 'Gamme',
         'sanitize_callback' => 'sanitize_text_field',
     ) );
     $wp_customize->add_control( 'chg_gamme_tag', array(
-        'label'   => 'Tag (ex: Gamme, Collection…)',
+        'label'   => 'Tag (ex : Gamme, Collection…)',
         'section' => 'chg_gamme',
         'type'    => 'text',
     ) );
 
-    // Titre de la section
+    // Titre
     $wp_customize->add_setting( 'chg_gamme_title', array(
         'default'           => 'Nos Lanieres',
         'sanitize_callback' => 'sanitize_text_field',
@@ -137,32 +137,50 @@ function chg_customizer_register( $wp_customize ) {
         'type'    => 'text',
     ) );
 
-    // Nombre de produits à afficher
+    // Nombre de produits
     $wp_customize->add_setting( 'chg_gamme_count', array(
         'default'           => '3',
         'sanitize_callback' => 'absint',
     ) );
     $wp_customize->add_control( 'chg_gamme_count', array(
         'label'       => 'Nombre de produits affichés (1 à 6)',
-        'description' => 'Combien de cartes produits afficher sur la page accueil.',
         'section'     => 'chg_gamme',
         'type'        => 'number',
         'input_attrs' => array( 'min' => 1, 'max' => 6 ),
     ) );
 
-    // Slug de catégorie WooCommerce
+    // ---- Catégorie : menu déroulant dynamique ----
+    // On construit la liste depuis les termes WooCommerce existants.
+    $cat_choices = array( '' => '— Tous les produits (aucun filtre) —' );
+    if ( class_exists( 'WooCommerce' ) ) {
+        $wc_cats = get_terms( array(
+            'taxonomy'   => 'product_cat',
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+            'hide_empty' => false,   // affiche aussi les catégories vides
+        ) );
+        if ( ! is_wp_error( $wc_cats ) && ! empty( $wc_cats ) ) {
+            foreach ( $wc_cats as $cat ) {
+                // La clé = slug (utilisé dans la requête produits)
+                // La valeur = nom affiché dans le Customizer
+                $cat_choices[ $cat->slug ] = $cat->name . ' (' . $cat->count . ' produit' . ( $cat->count > 1 ? 's' : '' ) . ')';
+            }
+        }
+    }
+
     $wp_customize->add_setting( 'chg_gamme_category', array(
         'default'           => '',
         'sanitize_callback' => 'sanitize_text_field',
     ) );
     $wp_customize->add_control( 'chg_gamme_category', array(
-        'label'       => 'Catégorie WooCommerce (slug)',
-        'description' => "Laissez vide pour afficher les derniers produits. Sinon, entrez le slug de la catégorie (ex: lanieres). Trouvez le slug dans Produits → Catégories dans l'admin.",
+        'label'       => 'Catégorie de produits',
+        'description' => "Sélectionnez une catégorie pour filtrer les produits affichés. Choisissez \u00ab Tous les produits \u00bb pour afficher les derniers publiés.",
         'section'     => 'chg_gamme',
-        'type'        => 'text',
+        'type'        => 'select',
+        'choices'     => $cat_choices,
     ) );
 
-    // Texte du lien "Voir tout"
+    // Texte "Voir tout"
     $wp_customize->add_setting( 'chg_gamme_viewall', array(
         'default'           => 'Voir tout',
         'sanitize_callback' => 'sanitize_text_field',
@@ -174,7 +192,7 @@ function chg_customizer_register( $wp_customize ) {
     ) );
 
     // ================================================================
-    // ---- Section : Reveal (La Lanière USB-C 3A) ----
+    // ---- Section : Reveal (Produit Vedette) ----
     // ================================================================
     $wp_customize->add_section( 'chg_reveal', array(
         'title'       => "Page d'accueil — Section Produit Vedette",
@@ -182,61 +200,29 @@ function chg_customizer_register( $wp_customize ) {
         'panel'       => 'chg_panel',
     ) );
 
-    // Titre ligne 1 et ligne 2
-    $wp_customize->add_setting( 'chg_reveal_title1', array(
-        'default'           => 'La Lanière',
-        'sanitize_callback' => 'sanitize_text_field',
-    ) );
-    $wp_customize->add_control( 'chg_reveal_title1', array(
-        'label'   => 'Titre — Ligne 1',
-        'section' => 'chg_reveal',
-        'type'    => 'text',
-    ) );
+    $wp_customize->add_setting( 'chg_reveal_title1', array( 'default' => 'La Lanière', 'sanitize_callback' => 'sanitize_text_field' ) );
+    $wp_customize->add_control( 'chg_reveal_title1', array( 'label' => 'Titre — Ligne 1', 'section' => 'chg_reveal', 'type' => 'text' ) );
 
-    $wp_customize->add_setting( 'chg_reveal_title2', array(
-        'default'           => 'USB-C 3A',
-        'sanitize_callback' => 'sanitize_text_field',
-    ) );
-    $wp_customize->add_control( 'chg_reveal_title2', array(
-        'label'       => 'Titre — Ligne 2 (en italique)',
-        'section'     => 'chg_reveal',
-        'type'        => 'text',
-    ) );
+    $wp_customize->add_setting( 'chg_reveal_title2', array( 'default' => 'USB-C 3A', 'sanitize_callback' => 'sanitize_text_field' ) );
+    $wp_customize->add_control( 'chg_reveal_title2', array( 'label' => 'Titre — Ligne 2 (italique)', 'section' => 'chg_reveal', 'type' => 'text' ) );
 
-    // Paragraphe description
     $wp_customize->add_setting( 'chg_reveal_desc', array(
         'default'           => "Notre accessoire le plus emblématique. Câble USB-C 3A intégré dans une lanière portée au cou. La charge toujours à portée de main, le téléphone jamais perdu.",
         'sanitize_callback' => 'sanitize_textarea_field',
     ) );
-    $wp_customize->add_control( 'chg_reveal_desc', array(
-        'label'   => 'Paragraphe description',
-        'section' => 'chg_reveal',
-        'type'    => 'textarea',
-    ) );
+    $wp_customize->add_control( 'chg_reveal_desc', array( 'label' => 'Paragraphe description', 'section' => 'chg_reveal', 'type' => 'textarea' ) );
 
-    // Bouton CTA
-    $wp_customize->add_setting( 'chg_reveal_cta_text', array(
-        'default'           => 'Découvrir',
-        'sanitize_callback' => 'sanitize_text_field',
-    ) );
-    $wp_customize->add_control( 'chg_reveal_cta_text', array(
-        'label'   => 'Texte du bouton',
-        'section' => 'chg_reveal',
-        'type'    => 'text',
-    ) );
+    $wp_customize->add_setting( 'chg_reveal_cta_text', array( 'default' => 'Découvrir', 'sanitize_callback' => 'sanitize_text_field' ) );
+    $wp_customize->add_control( 'chg_reveal_cta_text', array( 'label' => 'Texte du bouton', 'section' => 'chg_reveal', 'type' => 'text' ) );
 
-    $wp_customize->add_setting( 'chg_reveal_cta_url', array(
-        'default'           => '',
-        'sanitize_callback' => 'esc_url_raw',
-    ) );
+    $wp_customize->add_setting( 'chg_reveal_cta_url', array( 'default' => '', 'sanitize_callback' => 'esc_url_raw' ) );
     $wp_customize->add_control( 'chg_reveal_cta_url', array(
         'label'       => 'URL du bouton',
-        'description' => "Laissez vide pour pointer vers la boutique automatiquement.",
+        'description' => 'Laissez vide pour pointer vers la boutique automatiquement.',
         'section'     => 'chg_reveal',
         'type'        => 'url',
     ) );
 
-    // 5 specs (label + valeur)
     $spec_defaults = array(
         1 => array( 'label' => 'Puissance',      'value' => '3A — Charge rapide 18 W' ),
         2 => array( 'label' => 'Longueur câble', 'value' => '13,5 cm' ),
@@ -245,24 +231,10 @@ function chg_customizer_register( $wp_customize ) {
         5 => array( 'label' => 'Livraison',      'value' => 'Offerte dès 35 €' ),
     );
     for ( $i = 1; $i <= 5; $i++ ) {
-        $wp_customize->add_setting( "chg_reveal_spec_{$i}_label", array(
-            'default'           => $spec_defaults[$i]['label'],
-            'sanitize_callback' => 'sanitize_text_field',
-        ) );
-        $wp_customize->add_control( "chg_reveal_spec_{$i}_label", array(
-            'label'   => "Spec $i — Intitulé",
-            'section' => 'chg_reveal',
-            'type'    => 'text',
-        ) );
-        $wp_customize->add_setting( "chg_reveal_spec_{$i}_value", array(
-            'default'           => $spec_defaults[$i]['value'],
-            'sanitize_callback' => 'sanitize_text_field',
-        ) );
-        $wp_customize->add_control( "chg_reveal_spec_{$i}_value", array(
-            'label'   => "Spec $i — Valeur",
-            'section' => 'chg_reveal',
-            'type'    => 'text',
-        ) );
+        $wp_customize->add_setting( "chg_reveal_spec_{$i}_label", array( 'default' => $spec_defaults[$i]['label'], 'sanitize_callback' => 'sanitize_text_field' ) );
+        $wp_customize->add_control( "chg_reveal_spec_{$i}_label", array( 'label' => "Spec $i — Intitulé", 'section' => 'chg_reveal', 'type' => 'text' ) );
+        $wp_customize->add_setting( "chg_reveal_spec_{$i}_value", array( 'default' => $spec_defaults[$i]['value'], 'sanitize_callback' => 'sanitize_text_field' ) );
+        $wp_customize->add_control( "chg_reveal_spec_{$i}_value", array( 'label' => "Spec $i — Valeur", 'section' => 'chg_reveal', 'type' => 'text' ) );
     }
 
     // ---- Section : Couleurs ----
