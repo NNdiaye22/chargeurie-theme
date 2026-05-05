@@ -24,13 +24,10 @@ add_filter( 'woocommerce_variable_price_html', function( $price, $product ) {
 }, 10, 2 );
 
 // ── Masquer le stock restant côté client ─────────────
-// Supprime le message «X en stock» de WooCommerce partout sauf Admin
 add_filter( 'woocommerce_get_availability', function( $availability, $product ) {
     if ( ! is_admin() ) {
-        // On conserve uniquement le statut En stock / Épuisé, sans le chiffre
         if ( isset( $availability['availability'] ) ) {
             $txt = $availability['availability'];
-            // Si le message contient un chiffre, on le remplace par un label générique
             if ( preg_match( '/\d/', $txt ) ) {
                 $availability['availability'] = __( 'Stock limité', 'chargeurie' );
             }
@@ -72,7 +69,7 @@ function chg_card_badge( $product ) {
 
     if ( ! $in_stock && $backorders ) return [ 'id' => 'backorder', 'label' => 'Bient&ocirc;t dispo' ];
     if ( ! $in_stock )                return [ 'id' => 'out',       'label' => '&Eacute;puis&eacute;' ];
-    if ( $low_stock )                 return [ 'id' => 'low',       'label' => 'Stock limit&eacute;' ]; /* sans chiffre */
+    if ( $low_stock )                 return [ 'id' => 'low',       'label' => 'Stock limit&eacute;' ];
     if ( $sale_price )                return [ 'id' => 'promo',     'label' => 'Promo' ];
     return null;
 }
@@ -163,8 +160,9 @@ function chg_option( $key, $default = '' ) {
 }
 
 // ── CSS pages WooCommerce ─────────────────────
+// Chargé sur : panier, checkout, compte, endpoints WC, fiche produit
 add_action( 'wp_enqueue_scripts', function() {
-    if ( is_wc_endpoint_url() || is_account_page() || is_checkout() ) {
+    if ( is_cart() || is_checkout() || is_account_page() || is_wc_endpoint_url() || is_product() ) {
         wp_enqueue_style( 'chg-wc-pages', CHG_URI . '/assets/css/wc-pages.css', [], CHG_VERSION );
     }
     if ( is_page_template( 'page-privacy-policy.php' ) ) {
