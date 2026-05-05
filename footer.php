@@ -58,6 +58,7 @@
 
 <div class="f-bottom">
   <p>&copy; <?php echo date( 'Y' ); ?> <?php echo esc_html( get_bloginfo( 'name' ) ); ?> — Tous droits réservés</p>
+  <p class="f-credit">Site créé par <a href="https://www.buurdigital.com" target="_blank" rel="noopener noreferrer">BUUR Digital</a></p>
   <div class="pay-row">
     <span class="pay">Visa</span>
     <span class="pay">Mastercard</span>
