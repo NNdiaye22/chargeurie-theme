@@ -80,6 +80,18 @@ for ( $i = 1; $i <= 5; $i++ ) {
     );
 }
 
+// ---- Section Blog : 3 derniers articles ----
+$blog_tag      = esc_html( get_theme_mod( 'chg_blog_tag',   'Blog' ) );
+$blog_title    = esc_html( get_theme_mod( 'chg_blog_title', 'Actualités' ) );
+$blog_viewall  = esc_html( get_theme_mod( 'chg_blog_viewall', 'Tous les articles' ) );
+$blog_url      = get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/blog/' );
+$blog_posts    = new WP_Query( [
+    'posts_per_page' => 3,
+    'post_status'    => 'publish',
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+] );
+
 $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
 ?>
 
@@ -211,6 +223,75 @@ $manifesto_words = explode( ' ', esc_html( $manifesto_raw ) );
     <?php } ?>
   </div>
 </section>
+
+<!-- BLOG -->
+<?php if ( $blog_posts->have_posts() ) : ?>
+<section class="chg-home-blog" id="blog">
+  <div class="chg-home-blog-inner">
+
+    <header class="chg-home-blog-header">
+      <div class="chg-home-blog-tag"><?php echo $blog_tag; ?></div>
+      <h2 class="chg-home-blog-title"><?php echo $blog_title; ?></h2>
+      <a href="<?php echo esc_url( $blog_url ); ?>" class="chg-home-blog-viewall">
+        <?php echo $blog_viewall; ?> &rarr;
+      </a>
+    </header>
+
+    <div class="chg-home-blog-grid">
+      <?php
+      $first = true;
+      while ( $blog_posts->have_posts() ) :
+        $blog_posts->the_post();
+        $cats = get_the_category();
+        $cat  = $cats ? $cats[0] : null;
+        $read_time = max( 1, round( str_word_count( strip_tags( get_the_content() ) ) / 200 ) );
+      ?>
+      <article class="chg-home-post-card<?php echo $first ? ' chg-home-post-card--featured' : ''; ?>">
+        <?php if ( has_post_thumbnail() ) : ?>
+          <a href="<?php the_permalink(); ?>" class="chg-home-post-img" aria-hidden="true" tabindex="-1">
+            <?php the_post_thumbnail( $first ? 'large' : 'medium_large', [ 'loading' => 'lazy' ] ); ?>
+          </a>
+        <?php else : ?>
+          <a href="<?php the_permalink(); ?>" class="chg-home-post-img chg-home-post-img--empty" aria-hidden="true" tabindex="-1">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </a>
+        <?php endif; ?>
+
+        <div class="chg-home-post-body">
+          <div class="chg-post-meta">
+            <?php if ( $cat ) : ?>
+              <a href="<?php echo esc_url( get_category_link( $cat->term_id ) ); ?>" class="chg-post-cat">
+                <?php echo esc_html( $cat->name ); ?>
+              </a>
+            <?php endif; ?>
+            <time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>" class="chg-post-date">
+              <?php echo esc_html( get_the_date() ); ?>
+            </time>
+            <span class="chg-post-readtime"><?php printf( esc_html__( '%d min', 'chargeurie' ), $read_time ); ?></span>
+          </div>
+
+          <h3 class="chg-home-post-title">
+            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+          </h3>
+
+          <?php if ( $first ) : ?>
+            <p class="chg-home-post-excerpt">
+              <?php echo wp_trim_words( get_the_excerpt(), 22, '…' ); ?>
+            </p>
+          <?php endif; ?>
+
+          <a href="<?php the_permalink(); ?>" class="chg-post-card-link" aria-label="<?php echo esc_attr( sprintf( __( 'Lire %s', 'chargeurie' ), get_the_title() ) ); ?>">
+            <?php esc_html_e( 'Lire', 'chargeurie' ); ?>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+      <?php $first = false; endwhile; wp_reset_postdata(); ?>
+    </div>
+
+  </div>
+</section>
+<?php endif; ?>
 
 <!-- NEWSLETTER -->
 <section class="newsletter-section" id="nl">
