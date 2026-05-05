@@ -7,119 +7,277 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 function chg_customizer_register( $wp_customize ) {
 
     // Panel
-    $wp_customize->add_panel( 'chg_panel', [
+    $wp_customize->add_panel( 'chg_panel', array(
         'title'    => 'Chargeurie — Thème',
         'priority' => 30,
-    ] );
+    ) );
 
     // ---- Section : Identité ----
-    $wp_customize->add_section( 'chg_identity', [
+    $wp_customize->add_section( 'chg_identity', array(
         'title' => 'Identité',
         'panel' => 'chg_panel',
-    ] );
-    $fields_identity = [
-        'chg_tagline'       => [ 'default' => 'Câbles & Accessoires de Charge — France', 'label' => 'Sous-titre nav' ],
-        'chg_ticker_text'   => [ 'default' => 'Charge Rapide 60 W · USB-C 3A · 5 Coloris · Lanière Téléphone · Câble Bracelet · 4-en-1 · Livraison offerte dès 35 € · Garantie 2 ans ·', 'label' => 'Ticker texte' ],
-        'chg_instagram_url' => [ 'default' => '#', 'label' => 'Instagram URL' ],
-        'chg_tiktok_url'    => [ 'default' => '#', 'label' => 'TikTok URL' ],
-        'chg_linkedin_url'  => [ 'default' => '#', 'label' => 'LinkedIn URL' ],
-        'chg_contact_email' => [ 'default' => 'contact@chargeurie.fr', 'label' => 'Email de contact' ],
-    ];
+    ) );
+    $fields_identity = array(
+        'chg_tagline'       => array( 'default' => 'Câbles & Accessoires de Charge — France', 'label' => 'Sous-titre nav' ),
+        'chg_ticker_text'   => array( 'default' => 'Charge Rapide 60 W · USB-C 3A · 5 Coloris · Lanière Téléphone · Câble Bracelet · 4-en-1 · Livraison offerte dès 35 € · Garantie 2 ans ·', 'label' => 'Ticker texte' ),
+        'chg_instagram_url' => array( 'default' => '#', 'label' => 'Instagram URL' ),
+        'chg_tiktok_url'    => array( 'default' => '#', 'label' => 'TikTok URL' ),
+        'chg_linkedin_url'  => array( 'default' => '#', 'label' => 'LinkedIn URL' ),
+        'chg_contact_email' => array( 'default' => 'contact@chargeurie.fr', 'label' => 'Email de contact' ),
+    );
     foreach ( $fields_identity as $key => $args ) {
-        $wp_customize->add_setting( $key, [ 'default' => $args['default'], 'sanitize_callback' => 'sanitize_text_field' ] );
-        $wp_customize->add_control( $key, [ 'label' => $args['label'], 'section' => 'chg_identity', 'type' => 'text' ] );
+        $wp_customize->add_setting( $key, array( 'default' => $args['default'], 'sanitize_callback' => 'sanitize_text_field' ) );
+        $wp_customize->add_control( $key, array( 'label' => $args['label'], 'section' => 'chg_identity', 'type' => 'text' ) );
     }
 
     // ---- Section : Hero ----
-    $wp_customize->add_section( 'chg_hero', [
-        'title' => 'Page d\'accueil — Hero',
+    $wp_customize->add_section( 'chg_hero', array(
+        'title' => "Page d'accueil — Hero",
         'panel' => 'chg_panel',
-    ] );
-    $fields_hero = [
-        'chg_hero_line1'    => [ 'default' => 'PORTEZ',   'label' => 'Ligne 1 (plein)' ],
-        'chg_hero_line2'    => [ 'default' => 'VOTRE',    'label' => 'Ligne 2 (outline)' ],
-        'chg_hero_line3'    => [ 'default' => 'CHARGE',   'label' => 'Ligne 3 (plein)' ],
-        'chg_hero_subtitle' => [ 'default' => 'Des câbles pensés pour être portés au quotidien — autour du cou, au poignet, en porte-clé.', 'label' => 'Sous-titre hero' ],
-        'chg_hero_cta'      => [ 'default' => 'Découvrir la gamme', 'label' => 'CTA hero' ],
-    ];
+    ) );
+    $fields_hero = array(
+        'chg_hero_line1'    => array( 'default' => 'PORTEZ',   'label' => 'Ligne 1 (plein)' ),
+        'chg_hero_line2'    => array( 'default' => 'VOTRE',    'label' => 'Ligne 2 (outline)' ),
+        'chg_hero_line3'    => array( 'default' => 'CHARGE',   'label' => 'Ligne 3 (plein)' ),
+        'chg_hero_subtitle' => array( 'default' => 'Des câbles pensés pour être portés au quotidien — autour du cou, au poignet, en porte-clé.', 'label' => 'Sous-titre hero' ),
+        'chg_hero_cta'      => array( 'default' => 'Découvrir la gamme', 'label' => 'CTA hero' ),
+    );
     foreach ( $fields_hero as $key => $args ) {
-        $wp_customize->add_setting( $key, [ 'default' => $args['default'], 'sanitize_callback' => 'sanitize_text_field' ] );
-        $wp_customize->add_control( $key, [ 'label' => $args['label'], 'section' => 'chg_hero', 'type' => 'text' ] );
+        $wp_customize->add_setting( $key, array( 'default' => $args['default'], 'sanitize_callback' => 'sanitize_text_field' ) );
+        $wp_customize->add_control( $key, array( 'label' => $args['label'], 'section' => 'chg_hero', 'type' => 'text' ) );
     }
 
-    // ---- Bannière hero : images desktop + mobile ----
-    $wp_customize->add_setting( 'chg_hero_img_desktop', [
+    $wp_customize->add_setting( 'chg_hero_img_desktop', array(
         'default'           => 0,
         'sanitize_callback' => 'absint',
-    ] );
-    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_desktop', [
+    ) );
+    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_desktop', array(
         'label'       => '🖥 Image Hero — Desktop (recommandé : 1920×1080)',
         'description' => 'Affichée sur écrans > 768px.',
         'section'     => 'chg_hero',
         'mime_type'   => 'image',
-    ] ) );
+    ) ) );
 
-    $wp_customize->add_setting( 'chg_hero_img_mobile', [
+    $wp_customize->add_setting( 'chg_hero_img_mobile', array(
         'default'           => 0,
         'sanitize_callback' => 'absint',
-    ] );
-    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_mobile', [
+    ) );
+    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'chg_hero_img_mobile', array(
         'label'       => '📱 Image Hero — Mobile (recommandé : 750×1334)',
-        'description' => 'Affichée sur écrans ≤ 768px. Si vide, l\'image desktop sera utilisée.',
+        'description' => "Affichée sur écrans ≤ 768px. Si vide, l'image desktop sera utilisée.",
         'section'     => 'chg_hero',
         'mime_type'   => 'image',
-    ] ) );
+    ) ) );
 
-    $wp_customize->add_setting( 'chg_hero_overlay', [
+    $wp_customize->add_setting( 'chg_hero_overlay', array(
         'default'           => '0.55',
         'sanitize_callback' => 'sanitize_text_field',
-    ] );
-    $wp_customize->add_control( 'chg_hero_overlay', [
+    ) );
+    $wp_customize->add_control( 'chg_hero_overlay', array(
         'label'       => 'Opacité overlay sombre (0 = transparent, 1 = noir)',
         'description' => 'Assombrit la bannière pour garder le texte lisible.',
         'section'     => 'chg_hero',
         'type'        => 'range',
-        'input_attrs' => [ 'min' => '0', 'max' => '1', 'step' => '0.05' ],
-    ] );
+        'input_attrs' => array( 'min' => '0', 'max' => '1', 'step' => '0.05' ),
+    ) );
 
     // ---- Section : Manifeste ----
-    $wp_customize->add_section( 'chg_manifesto', [
-        'title' => 'Page d\'accueil — Manifeste',
+    $wp_customize->add_section( 'chg_manifesto', array(
+        'title' => "Page d'accueil — Manifeste",
         'panel' => 'chg_panel',
-    ] );
-    $wp_customize->add_setting( 'chg_manifesto_text', [ 'default' => 'Conçu pour être porté, pas rangé.', 'sanitize_callback' => 'sanitize_text_field' ] );
-    $wp_customize->add_control( 'chg_manifesto_text', [ 'label' => 'Phrase manifeste', 'section' => 'chg_manifesto', 'type' => 'text' ] );
-    $wp_customize->add_setting( 'chg_manifesto_sub', [ 'default' => 'La technologie la plus utile est celle que vous avez toujours sur vous. Chargeurie conçoit des accessoires qui disparaissent dans votre quotidien — jusqu\'au moment où vous en avez besoin.', 'sanitize_callback' => 'sanitize_textarea_field' ] );
-    $wp_customize->add_control( 'chg_manifesto_sub', [ 'label' => 'Sous-texte manifeste', 'section' => 'chg_manifesto', 'type' => 'textarea' ] );
-
-    // ---- Section : Couleurs ----
-    $wp_customize->add_section( 'chg_colors', [ 'title' => 'Couleurs', 'panel' => 'chg_panel' ] );
-    $wp_customize->add_setting( 'chg_color_blue', [ 'default' => '#0071e3', 'sanitize_callback' => 'sanitize_hex_color', 'transport' => 'postMessage' ] );
-    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'chg_color_blue', [ 'label' => 'Couleur accent (bleu)', 'section' => 'chg_colors' ] ) );
+    ) );
+    $wp_customize->add_setting( 'chg_manifesto_text', array( 'default' => 'Conçu pour être porté, pas rangé.', 'sanitize_callback' => 'sanitize_text_field' ) );
+    $wp_customize->add_control( 'chg_manifesto_text', array( 'label' => 'Phrase manifeste', 'section' => 'chg_manifesto', 'type' => 'text' ) );
+    $wp_customize->add_setting( 'chg_manifesto_sub', array( 'default' => "La technologie la plus utile est celle que vous avez toujours sur vous. Chargeurie conçoit des accessoires qui disparaissent dans votre quotidien — jusqu'au moment où vous en avez besoin.", 'sanitize_callback' => 'sanitize_textarea_field' ) );
+    $wp_customize->add_control( 'chg_manifesto_sub', array( 'label' => 'Sous-texte manifeste', 'section' => 'chg_manifesto', 'type' => 'textarea' ) );
 
     // ---- Section : Stats ----
-    $wp_customize->add_section( 'chg_stats', [ 'title' => 'Page d\'accueil — Stats', 'panel' => 'chg_panel' ] );
-    $stat_defaults = [
-        1 => [ 'num' => '60', 'unit' => 'Puissance',  'suffix' => 'W',   'desc' => 'Charge rapide sur l\'ensemble de la gamme' ],
-        2 => [ 'num' => '5',  'unit' => 'Coloris',    'suffix' => '',    'desc' => 'Chaque produit décliné en plusieurs teintes' ],
-        3 => [ 'num' => '4',  'unit' => 'En 1',       'suffix' => '',    'desc' => 'Compatibilité universelle avec un seul câble' ],
-        4 => [ 'num' => '2',  'unit' => 'Garantie',   'suffix' => 'ans', 'desc' => 'Garantie constructeur sur tous les produits' ],
-    ];
+    $wp_customize->add_section( 'chg_stats', array( 'title' => "Page d'accueil — Stats", 'panel' => 'chg_panel' ) );
+    $stat_defaults = array(
+        1 => array( 'num' => '60', 'unit' => 'Puissance',  'suffix' => 'W',   'desc' => "Charge rapide sur l'ensemble de la gamme" ),
+        2 => array( 'num' => '5',  'unit' => 'Coloris',    'suffix' => '',    'desc' => 'Chaque produit décliné en plusieurs teintes' ),
+        3 => array( 'num' => '4',  'unit' => 'En 1',       'suffix' => '',    'desc' => 'Compatibilité universelle avec un seul câble' ),
+        4 => array( 'num' => '2',  'unit' => 'Garantie',   'suffix' => 'ans', 'desc' => 'Garantie constructeur sur tous les produits' ),
+    );
     for ( $i = 1; $i <= 4; $i++ ) {
-        foreach ( [ 'num', 'unit', 'suffix', 'desc' ] as $f ) {
-            $wp_customize->add_setting( "chg_stat_{$i}_{$f}", [ 'default' => $stat_defaults[$i][$f], 'sanitize_callback' => 'sanitize_text_field' ] );
-            $wp_customize->add_control( "chg_stat_{$i}_{$f}", [ 'label' => "Stat $i — " . ucfirst($f), 'section' => 'chg_stats', 'type' => 'text' ] );
+        foreach ( array( 'num', 'unit', 'suffix', 'desc' ) as $f ) {
+            $wp_customize->add_setting( "chg_stat_{$i}_{$f}", array( 'default' => $stat_defaults[$i][$f], 'sanitize_callback' => 'sanitize_text_field' ) );
+            $wp_customize->add_control( "chg_stat_{$i}_{$f}", array( 'label' => "Stat $i — " . ucfirst($f), 'section' => 'chg_stats', 'type' => 'text' ) );
         }
     }
 
+    // ================================================================
+    // ---- Section : Gamme (produits accueil) ----
+    // ================================================================
+    $wp_customize->add_section( 'chg_gamme', array(
+        'title'       => "Page d'accueil — Section Gamme",
+        'description' => 'Modifiez le titre, le tag et les produits affichés dans la section grille de la page accueil.',
+        'panel'       => 'chg_panel',
+    ) );
+
+    // Tag (petit texte au-dessus du titre)
+    $wp_customize->add_setting( 'chg_gamme_tag', array(
+        'default'           => 'Gamme',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_gamme_tag', array(
+        'label'   => 'Tag (ex: Gamme, Collection…)',
+        'section' => 'chg_gamme',
+        'type'    => 'text',
+    ) );
+
+    // Titre de la section
+    $wp_customize->add_setting( 'chg_gamme_title', array(
+        'default'           => 'Nos Lanieres',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_gamme_title', array(
+        'label'   => 'Titre de la section',
+        'section' => 'chg_gamme',
+        'type'    => 'text',
+    ) );
+
+    // Nombre de produits à afficher
+    $wp_customize->add_setting( 'chg_gamme_count', array(
+        'default'           => '3',
+        'sanitize_callback' => 'absint',
+    ) );
+    $wp_customize->add_control( 'chg_gamme_count', array(
+        'label'       => 'Nombre de produits affichés (1 à 6)',
+        'description' => 'Combien de cartes produits afficher sur la page accueil.',
+        'section'     => 'chg_gamme',
+        'type'        => 'number',
+        'input_attrs' => array( 'min' => 1, 'max' => 6 ),
+    ) );
+
+    // Slug de catégorie WooCommerce
+    $wp_customize->add_setting( 'chg_gamme_category', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_gamme_category', array(
+        'label'       => 'Catégorie WooCommerce (slug)',
+        'description' => "Laissez vide pour afficher les derniers produits. Sinon, entrez le slug de la catégorie (ex: lanieres). Trouvez le slug dans Produits → Catégories dans l'admin.",
+        'section'     => 'chg_gamme',
+        'type'        => 'text',
+    ) );
+
+    // Texte du lien "Voir tout"
+    $wp_customize->add_setting( 'chg_gamme_viewall', array(
+        'default'           => 'Voir tout',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_gamme_viewall', array(
+        'label'   => 'Texte lien "Voir tout"',
+        'section' => 'chg_gamme',
+        'type'    => 'text',
+    ) );
+
+    // ================================================================
+    // ---- Section : Reveal (La Lanière USB-C 3A) ----
+    // ================================================================
+    $wp_customize->add_section( 'chg_reveal', array(
+        'title'       => "Page d'accueil — Section Produit Vedette",
+        'description' => 'Modifiez la section mise en avant produit (La Lanière USB-C 3A par défaut).',
+        'panel'       => 'chg_panel',
+    ) );
+
+    // Titre ligne 1 et ligne 2
+    $wp_customize->add_setting( 'chg_reveal_title1', array(
+        'default'           => 'La Lanière',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_reveal_title1', array(
+        'label'   => 'Titre — Ligne 1',
+        'section' => 'chg_reveal',
+        'type'    => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'chg_reveal_title2', array(
+        'default'           => 'USB-C 3A',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_reveal_title2', array(
+        'label'       => 'Titre — Ligne 2 (en italique)',
+        'section'     => 'chg_reveal',
+        'type'        => 'text',
+    ) );
+
+    // Paragraphe description
+    $wp_customize->add_setting( 'chg_reveal_desc', array(
+        'default'           => "Notre accessoire le plus emblématique. Câble USB-C 3A intégré dans une lanière portée au cou. La charge toujours à portée de main, le téléphone jamais perdu.",
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ) );
+    $wp_customize->add_control( 'chg_reveal_desc', array(
+        'label'   => 'Paragraphe description',
+        'section' => 'chg_reveal',
+        'type'    => 'textarea',
+    ) );
+
+    // Bouton CTA
+    $wp_customize->add_setting( 'chg_reveal_cta_text', array(
+        'default'           => 'Découvrir',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'chg_reveal_cta_text', array(
+        'label'   => 'Texte du bouton',
+        'section' => 'chg_reveal',
+        'type'    => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'chg_reveal_cta_url', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ) );
+    $wp_customize->add_control( 'chg_reveal_cta_url', array(
+        'label'       => 'URL du bouton',
+        'description' => "Laissez vide pour pointer vers la boutique automatiquement.",
+        'section'     => 'chg_reveal',
+        'type'        => 'url',
+    ) );
+
+    // 5 specs (label + valeur)
+    $spec_defaults = array(
+        1 => array( 'label' => 'Puissance',      'value' => '3A — Charge rapide 18 W' ),
+        2 => array( 'label' => 'Longueur câble', 'value' => '13,5 cm' ),
+        3 => array( 'label' => 'Coloris',        'value' => '5 teintes disponibles' ),
+        4 => array( 'label' => 'Compatibilité',  'value' => 'iPhone & Android USB-C' ),
+        5 => array( 'label' => 'Livraison',      'value' => 'Offerte dès 35 €' ),
+    );
+    for ( $i = 1; $i <= 5; $i++ ) {
+        $wp_customize->add_setting( "chg_reveal_spec_{$i}_label", array(
+            'default'           => $spec_defaults[$i]['label'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ) );
+        $wp_customize->add_control( "chg_reveal_spec_{$i}_label", array(
+            'label'   => "Spec $i — Intitulé",
+            'section' => 'chg_reveal',
+            'type'    => 'text',
+        ) );
+        $wp_customize->add_setting( "chg_reveal_spec_{$i}_value", array(
+            'default'           => $spec_defaults[$i]['value'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ) );
+        $wp_customize->add_control( "chg_reveal_spec_{$i}_value", array(
+            'label'   => "Spec $i — Valeur",
+            'section' => 'chg_reveal',
+            'type'    => 'text',
+        ) );
+    }
+
+    // ---- Section : Couleurs ----
+    $wp_customize->add_section( 'chg_colors', array( 'title' => 'Couleurs', 'panel' => 'chg_panel' ) );
+    $wp_customize->add_setting( 'chg_color_blue', array( 'default' => '#0071e3', 'sanitize_callback' => 'sanitize_hex_color', 'transport' => 'postMessage' ) );
+    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'chg_color_blue', array( 'label' => 'Couleur accent (bleu)', 'section' => 'chg_colors' ) ) );
+
     // ---- Section : Formulaires ----
-    $wp_customize->add_section( 'chg_forms', [ 'title' => 'Formulaires', 'panel' => 'chg_panel' ] );
-    $wp_customize->add_setting( 'chg_cf7_contact_id',    [ 'default' => '', 'sanitize_callback' => 'absint' ] );
-    $wp_customize->add_control( 'chg_cf7_contact_id',    [ 'label' => 'CF7 — ID formulaire contact', 'section' => 'chg_forms', 'type' => 'number' ] );
-    $wp_customize->add_setting( 'chg_wpforms_contact_id',[ 'default' => '', 'sanitize_callback' => 'absint' ] );
-    $wp_customize->add_control( 'chg_wpforms_contact_id',[ 'label' => 'WPForms — ID formulaire contact', 'section' => 'chg_forms', 'type' => 'number' ] );
-    $wp_customize->add_setting( 'chg_mc4wp_form_id',    [ 'default' => '', 'sanitize_callback' => 'absint' ] );
-    $wp_customize->add_control( 'chg_mc4wp_form_id',    [ 'label' => 'Mailchimp MC4WP — ID formulaire newsletter', 'section' => 'chg_forms', 'type' => 'number' ] );
+    $wp_customize->add_section( 'chg_forms', array( 'title' => 'Formulaires', 'panel' => 'chg_panel' ) );
+    $wp_customize->add_setting( 'chg_cf7_contact_id',     array( 'default' => '', 'sanitize_callback' => 'absint' ) );
+    $wp_customize->add_control( 'chg_cf7_contact_id',     array( 'label' => 'CF7 — ID formulaire contact', 'section' => 'chg_forms', 'type' => 'number' ) );
+    $wp_customize->add_setting( 'chg_wpforms_contact_id', array( 'default' => '', 'sanitize_callback' => 'absint' ) );
+    $wp_customize->add_control( 'chg_wpforms_contact_id', array( 'label' => 'WPForms — ID formulaire contact', 'section' => 'chg_forms', 'type' => 'number' ) );
+    $wp_customize->add_setting( 'chg_mc4wp_form_id',      array( 'default' => '', 'sanitize_callback' => 'absint' ) );
+    $wp_customize->add_control( 'chg_mc4wp_form_id',      array( 'label' => 'Mailchimp MC4WP — ID formulaire newsletter', 'section' => 'chg_forms', 'type' => 'number' ) );
 }
 add_action( 'customize_register', 'chg_customizer_register' );
 
